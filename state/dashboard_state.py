@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import Any
 
 import streamlit as st
 
+from services.job_catalog_service import find_meta_for_artifact
 from services.job_runner_service import JobRunnerService
 
 
@@ -25,7 +27,7 @@ def apply_selected_region(region: str) -> None:
     st.session_state["selected_regions"] = [region]
 
 
-def build_matrix(paths: list[str], regions: list[str], meta_by_path: dict[str, dict], label: str) -> dict[str, str]:
+def build_matrix(paths: list[str], regions: list[str], meta_by_path: dict[str, dict[str, Any]], label: str) -> dict[str, str]:
     matrix: dict[str, str] = {}
     for rel_path in paths:
         job_regions = meta_by_path.get(rel_path, {}).get("regions", [])
@@ -35,22 +37,25 @@ def build_matrix(paths: list[str], regions: list[str], meta_by_path: dict[str, d
     return matrix
 
 
-def refresh_matrix_from_artifacts(artifacts: list[Path], meta_by_path: dict[str, dict], service: JobRunnerService) -> None:
+def refresh_matrix_from_artifacts(artifacts: list[Path], meta_by_path: dict[str, dict[str, Any]], service: JobRunnerService) -> None:
     run_started_at = st.session_state.get("run_started_at")
     if not run_started_at or not st.session_state["selected_paths"]:
         return
 
     recent_artifacts = [path for path in artifacts if path.stat().st_mtime >= run_started_at - 1]
-    recent_names = [path.name for path in recent_artifacts]
+    completed_targets: set[str] = set()
 
-    completed_targets = set()
-    for rel_path in st.session_state["selected_paths"]:
-        prefix = str(meta_by_path.get(rel_path, {}).get("output_prefix") or Path(rel_path).stem)
-        if any(name.startswith(prefix) for name in recent_names):
-            completed_targets.add(rel_path)
-            for key in list(st.session_state["matrix_state"].keys()):
-                if key.startswith(f"{rel_path}|"):
-                    st.session_state["matrix_state"][key] = "완료"
+    for artifact in recent_artifacts:
+        meta = find_meta_for_artifact(artifact, meta_by_path)
+        if not meta:
+            continue
+        rel_path = meta["path"]
+        if rel_path not in st.session_state["selected_paths"]:
+            continue
+        completed_targets.add(rel_path)
+        for key in list(st.session_state["matrix_state"].keys()):
+            if key.startswith(f"{rel_path}|"):
+                st.session_state["matrix_state"][key] = "완료"
 
     if completed_targets and len(completed_targets) == len(st.session_state["selected_paths"]):
         if service.state.status in {"RUNNING", "PENDING"}:
@@ -77,7 +82,7 @@ def sync_terminal_state(service: JobRunnerService) -> None:
     st.session_state["last_terminal_at"] = finished_at
 
 
-def collect_runtime(service: JobRunnerService, meta_by_path: dict[str, dict]) -> dict:
+def collect_runtime(service: JobRunnerService, meta_by_path: dict[str, dict[str, Any]]) -> dict[str, Any]:
     service.drain_logs()
     artifacts = service.list_artifacts()
     refresh_matrix_from_artifacts(artifacts, meta_by_path, service)
@@ -89,4 +94,3 @@ def collect_runtime(service: JobRunnerService, meta_by_path: dict[str, dict]) ->
         "last_run_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(artifacts[0].stat().st_mtime)) if artifacts else "-",
         "api_key_exists": bool(st.session_state.get("_api_key_exists")),
     }
-

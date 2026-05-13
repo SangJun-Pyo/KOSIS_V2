@@ -3,9 +3,12 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 import streamlit as st
+
+from services.job_catalog_service import find_meta_for_artifact
 
 
 def status_chip(status: str) -> tuple[str, str]:
@@ -33,19 +36,21 @@ def build_checklist(artifacts: list[Path], service_status: str) -> pd.DataFrame:
         ["KOSIS_API_KEY 설정 여부", "OK" if api_key_exists else "NG", "정상" if api_key_exists else "오류"],
         ["runner.py 존재 여부", "OK" if Path("runner.py").exists() else "NG", "정상" if Path("runner.py").exists() else "오류"],
         ["jobs 폴더 존재 여부", "OK" if Path("jobs").exists() else "NG", "정상" if Path("jobs").exists() else "오류"],
-        ["실행 상태", status_chip(service_status)[0], "정상" if service_status in {"PENDING", "RUNNING", "SUCCESS"} else "점검 필요"],
+        ["실행 상태", status_chip(service_status)[0], "정상" if service_status in {"PENDING", "RUNNING", "SUCCESS"} else "재확인 필요"],
         ["결과 파일 생성 여부", "OK" if artifacts else "-", "정상" if artifacts else "-"],
     ]
     return pd.DataFrame(rows, columns=["항목", "값", "상태"])
 
 
-def build_result_table(artifacts: list[Path]) -> pd.DataFrame:
-    rows = []
+def build_result_table(artifacts: list[Path], meta_by_path: dict[str, dict[str, Any]]) -> pd.DataFrame:
+    rows: list[dict[str, str]] = []
     for file_path in artifacts[:30]:
         stat = file_path.stat()
+        matched_meta = find_meta_for_artifact(file_path, meta_by_path)
         rows.append(
             {
                 "파일명": file_path.name,
+                "지역 범위": matched_meta.get("scope_label", "-") if matched_meta else "-",
                 "생성 시간": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
                 "크기": f"{stat.st_size / 1024:.1f} KB",
             }
@@ -67,11 +72,14 @@ def build_log_table(logs: list[str]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def build_matrix_table(selected_paths: list[str], selected_regions: list[str], meta_by_path: dict[str, dict]) -> pd.DataFrame:
+def build_matrix_table(selected_paths: list[str], selected_regions: list[str], meta_by_path: dict[str, dict[str, Any]]) -> pd.DataFrame:
     rows = []
     for rel_path in selected_paths[:10]:
         meta = meta_by_path.get(rel_path, {})
-        row = {"항목명": meta.get("name", rel_path)}
+        row = {
+            "항목명": meta.get("name", rel_path),
+            "적용 범위": meta.get("scope_label", "-"),
+        }
         job_regions = meta.get("regions", [])
         for region in selected_regions[:6]:
             row[region] = "대상 아님" if job_regions and region not in job_regions else st.session_state["matrix_state"].get(f"{rel_path}|{region}", "대기")
@@ -110,7 +118,7 @@ def render_region_map(selected_region: str, on_select) -> None:
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-def render_region_selector(regions: list[str], selected_region: str, all_job_rows: list[dict], on_region_change) -> None:
+def render_region_selector(regions: list[str], selected_region: str, on_region_change) -> None:
     with st.container(border=True):
         st.subheader("1. 지역 선택")
         dropdown_region = st.selectbox("지역 선택", regions, index=regions.index(selected_region))
@@ -122,11 +130,16 @@ def render_region_selector(regions: list[str], selected_region: str, all_job_row
         render_region_map(selected_region, on_region_change)
 
 
-def render_job_selector(groups: list[str], selected_group: str, filtered_job_rows: list[dict], meta_by_path: dict[str, dict]) -> None:
+def render_job_selector(groups: list[str], selected_group: str, filtered_job_rows: list[dict[str, Any]], meta_by_path: dict[str, dict[str, Any]]) -> None:
     with st.container(border=True):
         st.subheader("2. 파트 및 항목 선택")
         if groups:
-            st.session_state["selected_group"] = st.selectbox("파트", groups, index=groups.index(selected_group) if selected_group in groups else 0, key="selected_group_widget")
+            st.session_state["selected_group"] = st.selectbox(
+                "파트",
+                groups,
+                index=groups.index(selected_group) if selected_group in groups else 0,
+                key="selected_group_widget",
+            )
         else:
             st.warning("사용 가능한 jobs 그룹이 없습니다.")
 
@@ -145,17 +158,17 @@ def render_job_selector(groups: list[str], selected_group: str, filtered_job_row
             {
                 "항목명": row["name"],
                 "원천 데이터": row["source"],
-                "대상 지역": ", ".join(row["regions"]) if row["regions"] else "전국/공통",
+                "지역 범위": row.get("scope_label", "-"),
                 "최근 상태": "선택" if row["path"] in st.session_state["selected_paths"] else "대기",
             }
             for row in visible_rows[:30]
         ]
-        table_df = pd.DataFrame(table_rows) if table_rows else pd.DataFrame(columns=["항목명", "원천 데이터", "대상 지역", "최근 상태"])
+        table_df = pd.DataFrame(table_rows) if table_rows else pd.DataFrame(columns=["항목명", "원천 데이터", "지역 범위", "최근 상태"])
         st.dataframe(table_df, use_container_width=True, hide_index=True)
 
 
 @st.fragment(run_every="2s")
-def render_live_top(service, meta_by_path: dict[str, dict], valid_paths: list[str], collect_runtime, on_start, on_rerun_failed, on_stop) -> None:
+def render_live_top(service, meta_by_path: dict[str, dict[str, Any]], valid_paths: list[str], collect_runtime, on_start, on_rerun_failed, on_stop) -> None:
     runtime = collect_runtime(service, meta_by_path)
     artifacts = runtime["artifacts"]
     summary = runtime["summary"]
@@ -208,7 +221,7 @@ def render_live_top(service, meta_by_path: dict[str, dict], valid_paths: list[st
         (st.success if level == "success" else st.error)(message)
 
     if not api_key_exists:
-        st.error("KOSIS_API_KEY가 설정되지 않아 실제 수집 실행이 실패합니다.")
+        st.error("KOSIS_API_KEY가 설정되지 않아 실제 수집 실행은 실패합니다.")
     else:
         st.info(f"현재 선택 지역은 {st.session_state['selected_region']}입니다. 지역을 바꾸면 해당 지역으로 분류된 JSON 항목만 표시됩니다.")
 
@@ -227,7 +240,7 @@ def render_live_top(service, meta_by_path: dict[str, dict], valid_paths: list[st
 
 
 @st.fragment(run_every="2s")
-def render_live_right_panel(service, meta_by_path: dict[str, dict], collect_runtime) -> None:
+def render_live_right_panel(service, meta_by_path: dict[str, dict[str, Any]], collect_runtime) -> None:
     runtime = collect_runtime(service, meta_by_path)
     artifacts = runtime["artifacts"]
     running = runtime["running"]
@@ -237,14 +250,13 @@ def render_live_right_panel(service, meta_by_path: dict[str, dict], collect_runt
         if st.session_state["selected_paths"]:
             first_path = st.session_state["selected_paths"][0]
             first_meta = meta_by_path.get(first_path, {})
-            region_text = ", ".join(first_meta.get("regions", [])) if first_meta.get("regions") else "전국/공통"
             st.markdown(
                 f"""
 <div class="kv-grid">
   <div class="kv-key">작업명</div><div class="kv-value">{first_meta.get('name', first_path)} / {st.session_state['selected_period']}</div>
   <div class="kv-key">원천 통계원</div><div class="kv-value">{first_meta.get('source', 'KOSIS')}</div>
   <div class="kv-key">실행 파일</div><div class="kv-value"><code>{first_path}</code></div>
-  <div class="kv-key">대상 지역</div><div class="kv-value">{region_text}</div>
+  <div class="kv-key">대상 지역</div><div class="kv-value">{first_meta.get('scope_label', '-')}</div>
   <div class="kv-key">검증 상태</div><div class="kv-value">{status_chip(service.state.status)[0]}</div>
 </div>
 """,
@@ -256,7 +268,7 @@ def render_live_right_panel(service, meta_by_path: dict[str, dict], collect_runt
         progress_value = 55 if running else 100 if service.state.status in {"SUCCESS", "FAILED", "CANCELED"} else 0
         st.progress(progress_value, text="작업 진행 상태")
         st.markdown(
-            f"<div class='info-box'>선택 항목 {len(st.session_state['selected_paths'])}건과 지역 {len(st.session_state['selected_regions'])}개를 기준으로 실행 준비 상태를 계산하고 있습니다.</div>",
+            f"<div class='info-box'>선택 항목 {len(st.session_state['selected_paths'])}건과 지역 {len(st.session_state['selected_regions'])}개를 기준으로 실행 상태를 계산하고 있습니다.</div>",
             unsafe_allow_html=True,
         )
         st.divider()
@@ -265,7 +277,7 @@ def render_live_right_panel(service, meta_by_path: dict[str, dict], collect_runt
 
 
 @st.fragment(run_every="2s")
-def render_live_bottom(service, meta_by_path: dict[str, dict], collect_runtime) -> None:
+def render_live_bottom(service, meta_by_path: dict[str, dict[str, Any]], collect_runtime) -> None:
     runtime = collect_runtime(service, meta_by_path)
     artifacts = runtime["artifacts"]
 
@@ -275,15 +287,15 @@ def render_live_bottom(service, meta_by_path: dict[str, dict], collect_runtime) 
             st.subheader("5. 작업 현황")
             matrix_df = build_matrix_table(st.session_state["selected_paths"], st.session_state["selected_regions"], meta_by_path)
             if matrix_df.empty:
-                matrix_df = pd.DataFrame(columns=["항목명", "서울", "부산", "대구", "인천"])
+                matrix_df = pd.DataFrame(columns=["항목명", "적용 범위", "인천"])
             st.dataframe(matrix_df, use_container_width=True, hide_index=True)
 
     with bottom_right:
         with st.container(border=True):
             st.subheader("6. 결과 파일")
-            result_df = build_result_table(artifacts)
+            result_df = build_result_table(artifacts, meta_by_path)
             if result_df.empty:
-                result_df = pd.DataFrame(columns=["파일명", "생성 시간", "크기"])
+                result_df = pd.DataFrame(columns=["파일명", "지역 범위", "생성 시간", "크기"])
             st.dataframe(result_df, use_container_width=True, hide_index=True)
             if artifacts:
                 with open(artifacts[0], "rb") as file_obj:

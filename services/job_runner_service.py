@@ -61,7 +61,7 @@ class JobRunnerService:
         for directory in sorted(JOBS_DIR.iterdir()):
             if not directory.is_dir():
                 continue
-            if list(directory.glob("*.json")):
+            if list(directory.rglob("*.json")):
                 groups.append(directory.name)
         return groups
 
@@ -74,7 +74,7 @@ class JobRunnerService:
             group_dir = JOBS_DIR / group
             if not group_dir.exists():
                 continue
-            files.extend(str(path.relative_to(ROOT_DIR)) for path in sorted(group_dir.glob("*.json")))
+            files.extend(str(path.relative_to(ROOT_DIR)) for path in sorted(group_dir.rglob("*.json")))
         return files
 
     def is_running(self) -> bool:

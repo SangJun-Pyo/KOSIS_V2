@@ -91,7 +91,6 @@ with left_col:
     render_region_selector(
         regions=REGIONS,
         selected_region=st.session_state["selected_region"],
-        all_job_rows=all_job_rows,
         on_region_change=apply_selected_region,
     )
 

@@ -11,6 +11,33 @@
 - `ui/dashboard_views.py`: 지역 선택, 작업 선택, 실시간 패널 렌더링
 - `runner.py`, `jobs/`: 원본 실행 자산
 
+## 권장 폴더 구조
+`jobs`와 `output`은 같은 기준으로 관리합니다.
+
+```text
+jobs/
+  population/
+    common/
+    incheon/
+    multi_region/
+
+output/
+  population/
+    common/
+    incheon/
+    multi_region/
+```
+
+분류 기준은 아래처럼 가져갑니다.
+- `common`: 전국/광역/시도 공통 비교 작업
+- `incheon`: 인천 전용 작업
+- `multi_region`: 서울+인천처럼 특정 복수 지역 작업
+
+JSON 내부 메타도 함께 유지합니다.
+- `scope_all_regions: true`
+- `scope_regions: ["인천"]`
+- `scope_type: "common" | "incheon" | "multi_region"`
+
 ## 실행 방법
 1. `run_app.bat` 실행
 2. 브라우저에서 `http://localhost:8501` 접속
@@ -25,4 +52,5 @@
 ## 참고
 - API 키는 `KOSIS_API_KEY` 환경변수를 사용합니다.
 - 생성 결과물은 `output/` 아래에 저장됩니다.
+- `runner.py`와 앱은 `jobs/**/*.json`, `output/**/*.xlsx`를 재귀 탐색합니다.
 - 로컬 의존성은 `.deps/`에 설치되며 git에는 포함하지 않습니다.
