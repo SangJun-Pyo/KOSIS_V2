@@ -1,0 +1,5 @@
+﻿.deps/
+__pycache__/
+output/
+.env.local
+*.pyc
