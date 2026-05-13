@@ -11,7 +11,7 @@
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T10 T20 T25 T30 T31 T32 T40 T50",
-      "objL1": "00 11 26 27 28 29 30 31 36 41 51 43 44 52 46 47 48 50",
+      "objL1": "11 28",
       "objL2": "100 120 130"
     },
     {
@@ -23,7 +23,7 @@
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T10 T20 T30 T40 T41 T42 T50 T60",
-      "objL1": "00 11 26 27 28 29 30 31 36 41 51 43 44 52 46 47 48 50",
+      "objL1": "11 28",
       "objL2": "0",
       "objL3": "100 120 130"
     }
@@ -45,7 +45,13 @@
       ],
       "values": "DT",
       "preserve_multiindex_columns": true,
-      "sort": false
+      "sort": false,
+      "filters": {
+        "C1": [
+          "11",
+          "28"
+        ]
+      }
     },
     {
       "kind": "sum_pivot",
@@ -67,7 +73,13 @@
       ],
       "values": "DT",
       "preserve_multiindex_columns": true,
-      "sort": false
+      "sort": false,
+      "filters": {
+        "C1": [
+          "11",
+          "28"
+        ]
+      }
     },
     {
       "kind": "pivot",
@@ -76,6 +88,10 @@
       "filters": {
         "PRD_DE": [
           "2024"
+        ],
+        "C1": [
+          "11",
+          "28"
         ]
       },
       "replace_values": {
@@ -108,6 +124,10 @@
       "filters": {
         "PRD_DE": [
           "2025"
+        ],
+        "C1": [
+          "11",
+          "28"
         ]
       },
       "index": [
@@ -127,6 +147,10 @@
       "filters": {
         "PRD_DE": [
           "2025"
+        ],
+        "C1": [
+          "11",
+          "28"
         ]
       },
       "replace_values": {
@@ -158,5 +182,9 @@
     "??"
   ],
   "scope_type": "multi_region",
-  "scope_all_regions": false
+  "scope_all_regions": false,
+  "maintenance_review_20260513": [
+    "??/?? ??? ???? ??",
+    "?? ??? 15~29? ?? ??"
+  ]
 }

@@ -202,7 +202,7 @@
           "label": "65세 이상 고령인구",
           "codes": [
             "280",
-            "310",
+            "300",
             "330",
             "360",
             "380",
@@ -218,5 +218,8 @@
     "??"
   ],
   "scope_type": "incheon",
-  "scope_all_regions": false
+  "scope_all_regions": false,
+  "maintenance_review_20260513": [
+    "70~74? ?? ?? ??: ???? ?? ?? ??"
+  ]
 }

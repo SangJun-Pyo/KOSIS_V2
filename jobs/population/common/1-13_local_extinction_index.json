@@ -7,7 +7,7 @@
       "orgId": "101",
       "tblId": "DT_1IN1503",
       "prdSe": "Y",
-      "newEstPrdCnt": 5,
+      "newEstPrdCnt": 6,
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T00 T02",
@@ -63,6 +63,13 @@
           "37",
           "38",
           "39"
+        ],
+        "PRD_DE": [
+          "2021",
+          "2022",
+          "2023",
+          "2024",
+          "2025"
         ]
       },
       "sort": false
@@ -104,6 +111,13 @@
           "37",
           "38",
           "39"
+        ],
+        "PRD_DE": [
+          "2021",
+          "2022",
+          "2023",
+          "2024",
+          "2025"
         ]
       },
       "sort": false
@@ -119,11 +133,11 @@
         "PRD_DE"
       ],
       "years": [
-        "2020",
         "2021",
         "2022",
         "2023",
-        "2024"
+        "2024",
+        "2025"
       ],
       "numerator_filters": {
         "ITM_ID": [
@@ -187,11 +201,11 @@
       "area_label": "구분",
       "national_name": "전국",
       "national_alias": "계",
-      "cagr_label": "CAGR('20~'24)",
+      "cagr_label": "CAGR('21~'25)",
       "stage_label": "소멸위험 5단계",
-      "latest_year": "2024",
+      "latest_year": "2025",
       "subtotal": {
-        "label": "8개 광역시 소계",
+        "label": "8???? ??",
         "members": [
           "서울특별시",
           "부산광역시",
@@ -201,11 +215,16 @@
           "대전광역시",
           "울산광역시",
           "세종특별자치시"
-        ]
+        ],
+        "agg": "mean"
       }
     }
   ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": []
+  "scope_regions": [],
+  "maintenance_review_20260513": [
+    "?????? ??? ??? 2021~2025? ??",
+    "??????/???? ?? ?? ??? ??? ??"
+  ]
 }

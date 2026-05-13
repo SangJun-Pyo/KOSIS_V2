@@ -20,7 +20,7 @@
       "kind": "single_metric_share_summary",
       "source": "population_yearly",
       "sheet_name": "TABLE_VIEW",
-      "region_col": "C1_NM",
+      "region_col": "C1_LABEL",
       "years": [
         "2020",
         "2021",
@@ -34,28 +34,39 @@
         ]
       },
       "area_label": "구분",
-      "national_name": "인천광역시",
-      "national_alias": "인천광역시",
+      "national_name": "?????",
+      "national_alias": "??",
       "share_year": "2024",
       "cagr_label": "CAGR('20~'24)",
       "region_order": [
-        "인천광역시",
-        "중구",
-        "동구",
-        "미추홀구",
-        "연수구",
-        "남동구",
-        "부평구",
-        "계양구",
-        "서구",
-        "강화군",
-        "옹진군"
-      ]
+        "?????",
+        "??_??",
+        "??_??",
+        "??_????",
+        "??_???",
+        "??_???",
+        "??_???",
+        "??_???",
+        "??_??",
+        "??_???",
+        "??_???"
+      ],
+      "preprocess": {
+        "dedupe_region_names": {
+          "code_col": "C1",
+          "name_col": "C1_NM",
+          "label_col": "C1_LABEL"
+        }
+      }
     }
   ],
   "scope_regions": [
     "??"
   ],
   "scope_type": "incheon",
-  "scope_all_regions": false
+  "scope_all_regions": false,
+  "maintenance_review_20260513": [
+    "??/??/?? ?? ?? ???? ??? ?? ?? ?? ??? ??",
+    "?? ?? ?? ??? ????? ???"
+  ]
 }

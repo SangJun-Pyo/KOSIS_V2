@@ -1385,7 +1385,12 @@ def make_single_metric_share_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) ->
         members = [str(x) for x in subtotal.get("members", []) if str(x) in pv.index]
         if not members:
             continue
-        subtotal_vals = pv.loc[members, years].apply(pd.to_numeric, errors="coerce").sum(axis=0, min_count=1)
+        agg = str(subtotal.get("agg", "sum")).strip().lower()
+        subtotal_frame = pv.loc[members, years].apply(pd.to_numeric, errors="coerce")
+        if agg in {"mean", "avg", "average"}:
+            subtotal_vals = subtotal_frame.mean(axis=0)
+        else:
+            subtotal_vals = subtotal_frame.sum(axis=0, min_count=1)
         row = {area_label: str(subtotal.get("label", "소계"))}
         for year in years:
             row[f"{year}년"] = subtotal_vals.get(year)

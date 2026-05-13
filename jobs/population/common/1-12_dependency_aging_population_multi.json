@@ -7,7 +7,7 @@
       "orgId": "101",
       "tblId": "DT_1IN2030",
       "prdSe": "Y",
-      "newEstPrdCnt": 5,
+      "newEstPrdCnt": 6,
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T1 T2 T3 T4 T5 T6",
@@ -19,7 +19,7 @@
       "orgId": "101",
       "tblId": "DT_1IN1503",
       "prdSe": "Y",
-      "newEstPrdCnt": 5,
+      "newEstPrdCnt": 6,
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T00",
@@ -44,7 +44,11 @@
       "values": "DT",
       "filters": {
         "PRD_DE": [
-          "2024"
+          "2021",
+          "2022",
+          "2023",
+          "2024",
+          "2025"
         ],
         "C1": [
           "01",
@@ -110,6 +114,13 @@
           "37",
           "38",
           "39"
+        ],
+        "PRD_DE": [
+          "2021",
+          "2022",
+          "2023",
+          "2024",
+          "2025"
         ]
       },
       "sort": false
@@ -158,6 +169,13 @@
           "37",
           "38",
           "39"
+        ],
+        "PRD_DE": [
+          "2021",
+          "2022",
+          "2023",
+          "2024",
+          "2025"
         ]
       },
       "sort": false
@@ -196,21 +214,25 @@
       },
       "region_col": "C2_NM",
       "years": [
-        "2020",
         "2021",
         "2022",
         "2023",
-        "2024"
+        "2024",
+        "2025"
       ],
-      "rank_year": "2024",
+      "rank_year": "2025",
       "area_label": "구분",
       "rank_label": "순위",
-      "cagr_label": "CAGR('20~'24)",
+      "cagr_label": "CAGR('21~'25)",
       "national_name": "전국",
       "national_alias": "계"
     }
   ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": []
+  "scope_regions": [],
+  "maintenance_review_20260513": [
+    "?? 5?? ??? 2021~2025 ???? ??",
+    "??? ?? ? CAGR ?? ??"
+  ]
 }

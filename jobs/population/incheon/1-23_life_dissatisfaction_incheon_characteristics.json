@@ -5,7 +5,7 @@
     {
       "name": "life_dissatisfaction",
       "orgId": "204",
-      "tblId": "DT_204010_2024A002",
+      "tblId": "DT_204010_2025A002",
       "prdSe": "Y",
       "newEstPrdCnt": 1,
       "format": "json",
@@ -141,7 +141,7 @@
       "filters": {
         "C1": "{codes}",
         "PRD_DE": [
-          "2024"
+          "2025"
         ]
       },
       "index": [
@@ -173,7 +173,7 @@
           "B01"
         ],
         "PRD_DE": [
-          "2024"
+          "2025"
         ]
       },
       "index": [
@@ -190,5 +190,8 @@
     "??"
   ],
   "scope_type": "incheon",
-  "scope_all_regions": false
+  "scope_all_regions": false,
+  "maintenance_review_20260513": [
+    "2025 ?? ???? ?? ??? ?? ??"
+  ]
 }

@@ -773,5 +773,10 @@
     "??"
   ],
   "scope_type": "incheon",
-  "scope_all_regions": false
+  "scope_all_regions": false,
+  "maintenance_review_20260513": [
+    "2024 ?? ?? ?? ?? ??",
+    "??? ??? ?? ?? ??"
+  ],
+  "latest_confirmed_year": "2024"
 }

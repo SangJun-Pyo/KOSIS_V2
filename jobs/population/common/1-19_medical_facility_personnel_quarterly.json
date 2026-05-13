@@ -8,7 +8,7 @@
       "orgId": "354",
       "tblId": "DT_HIRA4B",
       "prdSe": "Q",
-      "newEstPrdCnt": 16,
+      "newEstPrdCnt": 20,
       "format": "json",
       "jsonVD": "Y",
       "itmId": "1635413103140064SC0",
@@ -20,7 +20,7 @@
       "orgId": "354",
       "tblId": "DT_HIRA4T",
       "prdSe": "Q",
-      "newEstPrdCnt": 16,
+      "newEstPrdCnt": 20,
       "format": "json",
       "jsonVD": "Y",
       "itmId": "1635413103140072AAA",
@@ -32,7 +32,7 @@
       "orgId": "354",
       "tblId": "DT_HIRA4U",
       "prdSe": "Q",
-      "newEstPrdCnt": 16,
+      "newEstPrdCnt": 20,
       "format": "json",
       "jsonVD": "Y",
       "itmId": "ALL",
@@ -401,12 +401,13 @@
         "약국"
       ],
       "years": [
+        "2021.4/4",
         "2022.4/4",
         "2023.4/4",
         "2024.4/4",
         "2025.4/4"
       ],
-      "cagr_label": "CAGR('22~'25)"
+      "cagr_label": "CAGR('21~'25)"
     },
     {
       "kind": "stack_blocks",
@@ -593,12 +594,13 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
+            "2021.4/4",
             "2022.4/4",
             "2023.4/4",
             "2024.4/4",
             "2025.4/4"
           ],
-          "cagr_label": "CAGR('22~'25)",
+          "cagr_label": "CAGR('21~'25)",
           "blank_rows": 1
         },
         {
@@ -653,12 +655,13 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
+            "2021.4/4",
             "2022.4/4",
             "2023.4/4",
             "2024.4/4",
             "2025.4/4"
           ],
-          "cagr_label": "CAGR('22~'25)"
+          "cagr_label": "CAGR('21~'25)"
         }
       ]
     },
@@ -867,12 +870,13 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
+            "2021.4/4",
             "2022.4/4",
             "2023.4/4",
             "2024.4/4",
             "2025.4/4"
           ],
-          "cagr_label": "CAGR('22~'25)",
+          "cagr_label": "CAGR('21~'25)",
           "blank_rows": 1
         },
         {
@@ -967,12 +971,13 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
+            "2021.4/4",
             "2022.4/4",
             "2023.4/4",
             "2024.4/4",
             "2025.4/4"
           ],
-          "cagr_label": "CAGR('22~'25)",
+          "cagr_label": "CAGR('21~'25)",
           "blank_rows": 1
         },
         {
@@ -1027,17 +1032,22 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
+            "2021.4/4",
             "2022.4/4",
             "2023.4/4",
             "2024.4/4",
             "2025.4/4"
           ],
-          "cagr_label": "CAGR('22~'25)"
+          "cagr_label": "CAGR('21~'25)"
         }
       ]
     }
   ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": []
+  "scope_regions": [],
+  "maintenance_review_20260513": [
+    "?? ??? 2021~2025? ??",
+    "???? ?? ??? ?? ??"
+  ]
 }

@@ -81,7 +81,7 @@
         "제주특별자치도"
       ],
       "subtotal": {
-        "label": "8개광역시",
+        "label": "8???? ??",
         "members": [
           "서울특별시",
           "부산광역시",
@@ -91,11 +91,16 @@
           "대전광역시",
           "울산광역시",
           "세종특별자치시"
-        ]
+        ],
+        "agg": "mean"
       }
     }
   ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": []
+  "scope_regions": [],
+  "maintenance_review_20260513": [
+    "8???? ??? ?? ???? ???? ??",
+    "subtotal ?? ??? ??(mean)?? ??"
+  ]
 }

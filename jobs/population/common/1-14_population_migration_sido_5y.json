@@ -54,9 +54,30 @@
         "T25"
       ],
       "cagr_label": "CAGR('21~'25)"
+    },
+    {
+      "kind": "pivot",
+      "sheet_name": "INCHEON_VIEW",
+      "filters": {
+        "C1": [
+          "28"
+        ]
+      },
+      "index": [
+        "PRD_DE"
+      ],
+      "columns": [
+        "ITM_NM"
+      ],
+      "values": "DT",
+      "sort": false
     }
   ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": []
+  "scope_regions": [],
+  "maintenance_review_20260513": [
+    "?? ?? ?? ??? ??",
+    "CAGR ?? ?? ?? ??"
+  ]
 }
