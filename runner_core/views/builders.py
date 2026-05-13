@@ -3,20 +3,24 @@ from typing import Dict, List, Optional, Tuple
 import pandas as pd
 
 from runner_core.pivots.base import make_custom_pivot, make_default_pivot
-from runner_core.pivots.complex import (
-    make_age_distribution_summary_pivot,
+from runner_core.pivots.profile import (
     make_latest_profile_summary_pivot,
+    make_timeseries_profile_summary_pivot,
+    make_year_gender_mix_pivot,
+)
+from runner_core.pivots.ranking import (
     make_latest_rank_pivot,
+    make_rank_and_metric_block_summary_pivot,
+    make_rank_timeseries_pivot,
+)
+from runner_core.pivots.ratio import make_ratio_timeseries_pivot
+from runner_core.pivots.summary import (
+    make_age_distribution_summary_pivot,
     make_metric_block_summary_pivot,
     make_metric_summary_pivot,
     make_paired_metric_latest_compare_pivot,
     make_paired_metric_timeseries_summary_pivot,
-    make_rank_and_metric_block_summary_pivot,
-    make_rank_timeseries_pivot,
-    make_ratio_timeseries_pivot,
     make_single_metric_share_summary_pivot,
-    make_timeseries_profile_summary_pivot,
-    make_year_gender_mix_pivot,
 )
 from runner_core.preprocess.filters import apply_row_filters, apply_value_maps
 from runner_core.preprocess.transforms import apply_preprocess, flatten_for_block, substitute_template
