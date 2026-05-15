@@ -179,8 +179,8 @@ def render_live_top(service, meta_by_path: dict[str, dict[str, Any]], valid_path
     with st.container(border=True):
         left, right = st.columns([1.4, 2.8], gap="small")
         with left:
-            st.title("KOSIS 통계지표 자동 생성 시스템")
-            st.markdown("<p class='muted'>KOSIS 원천 엑셀을 정리하고 산식을 적용해 지표를 검증합니다.</p>", unsafe_allow_html=True)
+            st.title("한국지역고용연구소")
+            st.markdown("<p class='muted'>지역 고용·통계 데이터를 정리하고 지표 산출 결과를 검토합니다.</p>", unsafe_allow_html=True)
         with right:
             c1, c2, c3, c4, c5, c6 = st.columns([1.05, 0.85, 1.0, 1.25, 1.15, 1.0], gap="small")
             with c1:

@@ -14,7 +14,7 @@ from ui.dashboard_views import render_job_selector, render_live_bottom, render_l
 
 
 st.set_page_config(
-    page_title="KOSIS 통계지표 자동 생성 시스템",
+    page_title="한국지역고용연구소",
     page_icon="📊",
     layout="wide",
 )
