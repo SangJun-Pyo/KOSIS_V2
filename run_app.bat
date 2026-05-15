@@ -53,6 +53,13 @@ if errorlevel 1 (
   exit /b 1
 )
 
+if "%KOSIS_API_KEY%"=="" (
+  echo [WARN] KOSIS_API_KEY is not set.
+  echo [WARN] The app will open, but real KOSIS collection runs may fail.
+  echo [INFO] You can create a .env.local file with:
+  echo [INFO] KOSIS_API_KEY=YOUR_REAL_API_KEY
+)
+
 echo [INFO] Launching 한국지역고용연구소...
 call %PY_CMD% -m streamlit run app.py --global.developmentMode false
 pause

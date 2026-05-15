@@ -42,6 +42,7 @@ JSON 내부 메타도 함께 유지합니다.
 1. `run_app.bat` 실행
 2. 처음 실행 시 `requirements.txt` 기준으로 `.deps/`에 필요한 패키지를 자동 설치/업데이트
 3. 브라우저에서 `http://localhost:8501` 접속
+4. 상세 설치 절차는 [INSTALL_CHECKLIST.md](C:\Users\sangj\Kosis-main\KOSIS_V2\INSTALL_CHECKLIST.md) 참고
 
 ## 현재 지원 기능
 - 지역 선택 + 파트/항목 선택 실행
@@ -56,3 +57,4 @@ JSON 내부 메타도 함께 유지합니다.
 - `runner.py`와 앱은 `jobs/**/*.json`, `output/**/*.xlsx`를 재귀 탐색합니다.
 - 로컬 의존성은 `.deps/`에 설치되며 git에는 포함하지 않습니다.
 - 다른 PC에서는 Python 설치만 되어 있으면 `run_app.bat`가 의존성 설치까지 자동으로 처리합니다.
+- `KOSIS_API_KEY`가 없으면 앱은 열리지만 실제 수집 실행은 실패할 수 있습니다.
