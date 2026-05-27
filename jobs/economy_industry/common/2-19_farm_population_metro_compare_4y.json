@@ -1,0 +1,95 @@
+{
+  "job_name": "2-19_농가인구_광역비교_최근4년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "farm_population",
+      "orgId": "101",
+      "tblId": "INH_1EA1011_01",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T02",
+      "objL1": "00 11 21 22 23 24 25 26 29 31 32 33 34 35 36 37 38 39",
+      "filters": {
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      }
+    }
+  ],
+  "output_subdir": "economy_industry/common",
+  "output_prefix": "2-19_농가인구_광역비교_최근4년",
+  "views": [
+    {
+      "source": "farm_population",
+      "kind": "single_metric_share_summary",
+      "sheet_name": "TABLE_VIEW",
+      "region_col": "C1_NM",
+      "area_label": "구분",
+      "years": [
+        "2020",
+        "2021",
+        "2022",
+        "2023"
+      ],
+      "national_name": "전국",
+      "national_alias": "전국",
+      "include_share": false,
+      "include_cagr": false,
+      "value_round": 0,
+      "region_order": [
+        "전국",
+        "서울특별시",
+        "부산광역시",
+        "대구광역시",
+        "인천광역시",
+        "광주광역시",
+        "대전광역시",
+        "울산광역시",
+        "세종특별자치시",
+        "경기도",
+        "강원특별자치도",
+        "충청북도",
+        "충청남도",
+        "전북특별자치도",
+        "전라남도",
+        "경상북도",
+        "경상남도",
+        "제주특별자치도"
+      ],
+      "subtotals": [
+        {
+          "label": "8개 광역시 평균",
+          "members": [
+            "서울특별시",
+            "부산광역시",
+            "대구광역시",
+            "인천광역시",
+            "광주광역시",
+            "대전광역시",
+            "울산광역시",
+            "세종특별자치시"
+          ],
+          "agg": "mean",
+          "value_round": 3
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [
+    "전국"
+  ],
+  "maintenance_review_20260528": [
+    "경제산업 참고 엑셀 2-19 탭 기준으로 농가인구 시도별 비교표를 최근 4년으로 구성",
+    "사용자 제공 원천 INH_1EA1011_01에서 농가인구(T02)만 사용",
+    "live 원천에는 2024년이 추가돼 있지만 참고자료와 맞추기 위해 2020~2023만 반영하고 8개 광역시 평균을 함께 계산"
+  ]
+}

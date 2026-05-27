@@ -1,0 +1,107 @@
+{
+  "job_name": "2-14_시도별_서비스업생산지수_광역비교_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "service_index",
+      "orgId": "101",
+      "tblId": "DT_1KC2023",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T1 T2",
+      "objL1": "ALL",
+      "objL2": "ALL",
+      "filters": {
+        "C2_NM": [
+          "총지수"
+        ]
+      }
+    }
+  ],
+  "output_subdir": "economy_industry/common",
+  "output_prefix": "2-14_시도별_서비스업생산지수_광역비교_최근5년",
+  "views": [
+    {
+      "source": "service_index",
+      "kind": "region_year_metric_matrix",
+      "sheet_name": "TABLE_VIEW",
+      "region_col": "C1_NM",
+      "metric_col": "ITM_ID",
+      "row_label": "구분",
+      "years": [
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "2025"
+      ],
+      "metric_order": [
+        "T1",
+        "T2"
+      ],
+      "year_label_map": {
+        "2021": "2021년",
+        "2022": "2022년",
+        "2023": "2023년",
+        "2024": "2024년",
+        "2025": "2025년"
+      },
+      "metric_label_map": {
+        "T1": "경상지수",
+        "T2": "불변지수"
+      },
+      "value_round_map": {
+        "T1": 1,
+        "T2": 1
+      },
+      "region_order": [
+        "서울특별시",
+        "부산광역시",
+        "대구광역시",
+        "인천광역시",
+        "광주광역시",
+        "대전광역시",
+        "울산광역시",
+        "세종특별자치시",
+        "경기도",
+        "강원도",
+        "충청북도",
+        "충청남도",
+        "전라북도",
+        "전라남도",
+        "경상북도",
+        "경상남도",
+        "제주특별자치도"
+      ],
+      "subtotals": [
+        {
+          "label": "8개 광역시 평균",
+          "members": [
+            "서울특별시",
+            "부산광역시",
+            "대구광역시",
+            "인천광역시",
+            "광주광역시",
+            "대전광역시",
+            "울산광역시",
+            "세종특별자치시"
+          ],
+          "agg": "mean"
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [
+    "전국"
+  ],
+  "maintenance_review_20260528": [
+    "사용자 제공 원천 DT_1KC2023을 기준으로 시도별 서비스업생산지수 광역비교표를 최근 5년으로 구성",
+    "참고 엑셀 2-14 탭 기준 작업으로 정리",
+    "총지수만 사용하고 8개 광역시 평균은 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종의 단순평균으로 계산"
+  ]
+}

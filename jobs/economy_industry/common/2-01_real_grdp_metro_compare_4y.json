@@ -1,0 +1,87 @@
+{
+  "job_name": "2-01_지역내총생산_광역비교_최근4년",
+  "provider": "kosis_sources",
+  "sources": [
+    {
+      "name": "grdp",
+      "orgId": "101",
+      "tblId": "DT_1C91",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "itmId": "T1 T2 T3",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "economy_industry/common",
+  "output_prefix": "2-01_지역내총생산_광역비교_최근4년",
+  "views": [
+    {
+      "kind": "single_metric_share_summary",
+      "source": "grdp",
+      "sheet_name": "TABLE_VIEW",
+      "region_col": "C1_NM",
+      "years": [
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "filters": {
+        "ITM_NM": [
+          "실질"
+        ],
+        "C2_NM": [
+          "지역내총생산(시장가격)"
+        ]
+      },
+      "area_label": "구분",
+      "national_name": "전국",
+      "national_alias": "계",
+      "include_share": false,
+      "cagr_label": "CAGR('21~'24)",
+      "region_order": [
+        "전국",
+        "서울특별시",
+        "부산광역시",
+        "대구광역시",
+        "인천광역시",
+        "광주광역시",
+        "대전광역시",
+        "울산광역시",
+        "세종특별자치시",
+        "경기도",
+        "강원특별자치도",
+        "충청북도",
+        "충청남도",
+        "전북특별자치도",
+        "전라남도",
+        "경상북도",
+        "경상남도",
+        "제주특별자치도"
+      ],
+      "subtotal": {
+        "label": "8개 광역시 평균",
+        "members": [
+          "서울특별시",
+          "부산광역시",
+          "대구광역시",
+          "인천광역시",
+          "광주광역시",
+          "대전광역시",
+          "울산광역시",
+          "세종특별자치시"
+        ],
+        "agg": "mean"
+      },
+      "value_round": 0
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [],
+  "maintenance_review_20260527": [
+    "참고 엑셀 2-1 탭 기준으로 2021~2024 실질 지역내총생산만 사용",
+    "8개 광역시 평균은 참고자료와 동일하게 mean 후 정수 표기"
+  ]
+}

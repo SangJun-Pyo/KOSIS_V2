@@ -173,18 +173,23 @@ def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
             factor = float(scale_dt_cfg)
         d["DT"] = pd.to_numeric(d["DT"], errors="coerce") * factor
 
+    compose_specs = []
     compose_cfg = cfg.get("compose_column")
     if compose_cfg:
-        if not isinstance(compose_cfg, dict):
-            raise RuntimeError("preprocess.compose_column must be a dict")
-        target = str(compose_cfg.get("target", "")).strip()
-        template = str(compose_cfg.get("template", "")).strip()
+        compose_specs.append(compose_cfg)
+    more_compose_cfg = cfg.get("compose_columns")
+    if isinstance(more_compose_cfg, list):
+        compose_specs.extend([item for item in more_compose_cfg if isinstance(item, dict)])
+
+    for compose_spec in compose_specs:
+        target = str(compose_spec.get("target", "")).strip()
+        template = str(compose_spec.get("template", "")).strip()
         if not target or not template:
             raise RuntimeError("compose_column requires target and template")
 
-        def build_value(rec: pd.Series) -> str:
-            out = template
-            for key in re.findall(r"\{([^{}]+)\}", template):
+        def build_value(rec: pd.Series, tmpl: str = template) -> str:
+            out = tmpl
+            for key in re.findall(r"\{([^{}]+)\}", tmpl):
                 out = out.replace("{" + key + "}", str(rec.get(key, "")))
             return out
 
@@ -217,7 +222,16 @@ def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
 
         key_cols = category_map_agg_cfg.get("group_cols")
         if isinstance(key_cols, list) and key_cols:
-            group_cols = [str(c) for c in key_cols if str(c) in d.columns and str(c) not in {"DT", src}]
+            group_cols = []
+            for c in key_cols:
+                col = str(c)
+                if col == "DT" or col not in d.columns:
+                    continue
+                if col == src and target != src:
+                    continue
+                group_cols.append(col)
+            if target == src and target not in group_cols:
+                group_cols.append(target)
         else:
             group_cols = [c for c in d.columns if c not in {"DT", src, "LST_CHN_DE"}]
             if target != src:

@@ -1,0 +1,174 @@
+{
+  "job_name": "2-03_경기종합지수_인천전국_12월_최근5개년",
+  "provider": "kosis_sources",
+  "include_source_raw": false,
+  "sources": [
+    {
+      "name": "incheon_index",
+      "orgId": "204",
+      "tblId": "DT_204N_K002",
+      "prdSe": "M",
+      "startPrdDe": "202112",
+      "endPrdDe": "202512",
+      "itmId": "T01 T02 T03 T04 T05 T06 T07 T08",
+      "objL1": "ALL",
+      "format": "json"
+    },
+    {
+      "name": "national_index",
+      "orgId": "101",
+      "tblId": "DT_1C8015",
+      "prdSe": "M",
+      "startPrdDe": "202112",
+      "endPrdDe": "202512",
+      "itmId": "T1",
+      "objL1": "A00 A01 A03 A04 B00 B01 B03 B04",
+      "format": "json"
+    }
+  ],
+  "output_subdir": "economy_industry/incheon",
+  "output_prefix": "2-03_경기종합지수_인천전국_12월_최근5개년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "source": "incheon_index",
+          "kind": "row_timeseries",
+          "blank_rows": 0,
+          "years": [
+            "202112",
+            "202212",
+            "202312",
+            "202412",
+            "202512"
+          ],
+          "year_label_map": {
+            "202112": "2021.12",
+            "202212": "2022.12",
+            "202312": "2023.12",
+            "202412": "2024.12",
+            "202512": "2025.12"
+          },
+          "filters": {
+            "PRD_DE": [
+              "202112",
+              "202212",
+              "202312",
+              "202412",
+              "202512"
+            ]
+          },
+          "preprocess": {
+            "compose_column": {
+              "target": "ITEM_LABEL",
+              "template": "{ITM_ID}"
+            }
+          },
+          "replace_values": {
+            "ITEM_LABEL": {
+              "T01": "선행종합지수 (2020=100)",
+              "T02": "선행종합지수 전월비 (%)",
+              "T03": "선행종합지수 순환변동치 (2020=100)",
+              "T04": "순환변동치 전월차 (p)",
+              "T05": "동행종합지수 (2020=100)",
+              "T06": "동행종합지수 전월비 (%)",
+              "T07": "동행종합지수 순환변동치 (2020=100)",
+              "T08": "순환변동치 전월차 (p)"
+            }
+          },
+          "row_key_col": "ITM_ID",
+          "row_label_col": "ITEM_LABEL",
+          "row_order": [
+            "T01",
+            "T02",
+            "T03",
+            "T04",
+            "T05",
+            "T06",
+            "T07",
+            "T08"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "인천광역시",
+          "value_round": 1,
+          "repeat_group_label": false
+        },
+        {
+          "source": "national_index",
+          "kind": "row_timeseries",
+          "blank_rows": 0,
+          "years": [
+            "202112",
+            "202212",
+            "202312",
+            "202412",
+            "202512"
+          ],
+          "year_label_map": {
+            "202112": "2021.12",
+            "202212": "2022.12",
+            "202312": "2023.12",
+            "202412": "2024.12",
+            "202512": "2025.12"
+          },
+          "filters": {
+            "PRD_DE": [
+              "202112",
+              "202212",
+              "202312",
+              "202412",
+              "202512"
+            ]
+          },
+          "preprocess": {
+            "compose_column": {
+              "target": "ITEM_LABEL",
+              "template": "{C1}"
+            }
+          },
+          "replace_values": {
+            "ITEM_LABEL": {
+              "A00": "선행종합지수 (2020=100)",
+              "A01": "선행종합지수 전월비 (%)",
+              "A03": "선행종합지수 순환변동치 (2020=100)",
+              "A04": "순환변동치 전월차 (p)",
+              "B00": "동행종합지수 (2020=100)",
+              "B01": "동행종합지수 전월비 (%)",
+              "B03": "동행종합지수 순환변동치 (2020=100)",
+              "B04": "순환변동치 전월차 (p)"
+            }
+          },
+          "row_key_col": "C1",
+          "row_label_col": "ITEM_LABEL",
+          "row_order": [
+            "A00",
+            "A01",
+            "A03",
+            "A04",
+            "B00",
+            "B01",
+            "B03",
+            "B04"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "전국",
+          "value_round": 1,
+          "repeat_group_label": false
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "maintenance_review_20260528": [
+    "참고 엑셀 2-3 탭 기준으로 최근 5개년 12월 시점만 사용",
+    "인천은 DT_204N_K002, 전국은 DT_1C8015를 결합하여 TABLE_VIEW 구성"
+  ]
+}

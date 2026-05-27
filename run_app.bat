@@ -27,10 +27,43 @@ if not errorlevel 1 (
 )
 
 if "%PY_CMD%"=="" (
-  echo [ERROR] Python was not found.
-  echo [INFO] Python 3.13 or later is recommended.
-  pause
-  exit /b 1
+  echo [WARN] Python was not found.
+  echo [INFO] Trying to install Python 3.13 with winget...
+  where winget >nul 2>&1
+  if errorlevel 1 (
+    echo [ERROR] winget is not available on this PC.
+    echo [INFO] Install Python 3.13 or later, then run this file again.
+    echo [INFO] Download: https://www.python.org/downloads/windows/
+    pause
+    exit /b 1
+  )
+
+  winget install --id Python.Python.3.13 --exact --accept-package-agreements --accept-source-agreements
+  if errorlevel 1 (
+    echo [ERROR] Python installation did not complete.
+    echo [INFO] Install Python 3.13 or later manually, then run this file again.
+    echo [INFO] Download: https://www.python.org/downloads/windows/
+    pause
+    exit /b 1
+  )
+
+  echo [INFO] Python installation finished. Re-checking Python...
+  where py >nul 2>&1
+  if not errorlevel 1 (
+    set "PY_CMD=py -3.13"
+  ) else (
+    where python >nul 2>&1
+    if not errorlevel 1 (
+      set "PY_CMD=python"
+    )
+  )
+
+  if "%PY_CMD%"=="" (
+    echo [ERROR] Python still was not found in this console.
+    echo [INFO] Close this window and run run_app.bat again.
+    pause
+    exit /b 1
+  )
 )
 
 echo [INFO] Checking pip...

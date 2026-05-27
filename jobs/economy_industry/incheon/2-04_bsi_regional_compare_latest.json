@@ -1,0 +1,184 @@
+{
+  "job_name": "2-04_지역별_경기조사_광역비교_최신월",
+  "provider": "kosis_sources",
+  "include_source_raw": false,
+  "sources": [
+    {
+      "name": "national_bsi",
+      "orgId": "301",
+      "tblId": "DT_512Y013",
+      "prdSe": "M",
+      "newEstPrdCnt": 1,
+      "itmId": "13103134673999",
+      "objL1": "ALL",
+      "objL2": "ALL",
+      "filters": {
+        "C1_NM": [
+          "제 조 업",
+          "비제조업"
+        ],
+        "C2_NM": [
+          "기업심리지수실적",
+          "업황실적BSI 1)",
+          "매출실적BSI 2)",
+          "생산실적BSI 2)",
+          "신규수주실적BSI 2)",
+          "채산성실적BSI 6)",
+          "제품판매가격실적BSI 4)",
+          "제품재고실적BSI 3)",
+          "설비투자실적BSI 5)",
+          "인력사정실적BSI 3)",
+          "가동률실적BSI 4)",
+          "내수판매실적BSI 2)",
+          "수출실적BSI 2)",
+          "원자재구입가격실적BSI 4)",
+          "자금사정실적BSI 6)"
+        ]
+      },
+      "preprocess": {
+        "compose_columns": [
+          {
+            "target": "구분",
+            "template": "{C1_NM}|{C2_NM}"
+          },
+          {
+            "target": "REGION_LABEL",
+            "template": "전국"
+          }
+        ]
+      },
+      "replace_values": {
+        "구분": {
+          "제 조 업|기업심리지수실적": "제조업 기업심리지수실적",
+          "제 조 업|업황실적BSI 1)": "제조업 업황BSI",
+          "제 조 업|매출실적BSI 2)": "제조업 매출BSI",
+          "제 조 업|생산실적BSI 2)": "제조업 생산BSI",
+          "제 조 업|신규수주실적BSI 2)": "제조업 신규수주BSI",
+          "제 조 업|채산성실적BSI 6)": "제조업 채산성BSI",
+          "제 조 업|제품판매가격실적BSI 4)": "제조업 제품판매가격BSI",
+          "제 조 업|제품재고실적BSI 3)": "제조업 제품재고BSI",
+          "제 조 업|설비투자실적BSI 5)": "제조업 설비투자BSI",
+          "제 조 업|인력사정실적BSI 3)": "제조업 인력사정BSI",
+          "제 조 업|가동률실적BSI 4)": "제조업 가동률BSI",
+          "제 조 업|내수판매실적BSI 2)": "제조업 내수판매BSI",
+          "제 조 업|수출실적BSI 2)": "제조업 수출BSI",
+          "제 조 업|원자재구입가격실적BSI 4)": "제조업 원자재구입가격BSI",
+          "제 조 업|자금사정실적BSI 6)": "제조업 자금사정BSI",
+          "비제조업|기업심리지수실적": "비제조업 기업심리지수실적",
+          "비제조업|업황실적BSI 1)": "비제조업 업황BSI",
+          "비제조업|매출실적BSI 2)": "비제조업 매출BSI",
+          "비제조업|채산성실적BSI 6)": "비제조업 채산성BSI",
+          "비제조업|인력사정실적BSI 3)": "비제조업 인력사정BSI",
+          "비제조업|자금사정실적BSI 6)": "비제조업 자금사정BSI"
+        },
+        "PRD_DE": {
+          "202605": "2025.12"
+        }
+      }
+    },
+    {
+      "name": "regional_bsi",
+      "orgId": "301",
+      "tblId": "DT_512Y019",
+      "prdSe": "M",
+      "newEstPrdCnt": 1,
+      "itmId": "13103134492999",
+      "objL1": "ALL",
+      "objL2": "ALL",
+      "filters": {
+        "C2_NM": [
+          "인천",
+          "대전",
+          "충남",
+          "충북",
+          "강원",
+          "경기",
+          "경남",
+          "대전세종충남"
+        ]
+      },
+      "preprocess": {
+        "compose_columns": [
+          {
+            "target": "구분",
+            "template": "{C1_NM}"
+          },
+          {
+            "target": "REGION_LABEL",
+            "template": "{C2_NM}"
+          }
+        ]
+      },
+      "replace_values": {
+        "PRD_DE": {
+          "202605": "2025.12"
+        }
+      }
+    }
+  ],
+  "output_subdir": "economy_industry/incheon",
+  "output_prefix": "2-04_지역별_경기조사_광역비교_최신월",
+  "views": [
+    {
+      "kind": "pivot",
+      "sources": [
+        "national_bsi",
+        "regional_bsi"
+      ],
+      "sheet_name": "TABLE_VIEW",
+      "index": [
+        "구분"
+      ],
+      "columns": [
+        "REGION_LABEL"
+      ],
+      "values": "DT",
+      "sort": false,
+      "filters": {
+        "구분": [
+          "제조업 기업심리지수실적",
+          "제조업 업황BSI",
+          "제조업 매출BSI",
+          "제조업 생산BSI",
+          "제조업 신규수주BSI",
+          "제조업 채산성BSI",
+          "제조업 제품판매가격BSI",
+          "제조업 제품재고BSI",
+          "제조업 설비투자BSI",
+          "제조업 인력사정BSI",
+          "제조업 가동률BSI",
+          "제조업 내수판매BSI",
+          "제조업 수출BSI",
+          "제조업 원자재구입가격BSI",
+          "제조업 자금사정BSI",
+          "비제조업 기업심리지수실적",
+          "비제조업 업황BSI",
+          "비제조업 매출BSI",
+          "비제조업 채산성BSI",
+          "비제조업 인력사정BSI",
+          "비제조업 자금사정BSI"
+        ]
+      },
+      "column_order": [
+        "전국",
+        "인천",
+        "대전",
+        "충남",
+        "충북",
+        "강원",
+        "경기",
+        "경남",
+        "대전세종충남"
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "maintenance_review_20260528": [
+    "주신 두 KOSIS 원천 기준으로 최신월 BSI 비교표 생성",
+    "DT_512Y019 현재 응답 지역이 참고자료의 부산/대구/광주/울산이 아니라 인천/대전/충남/충북/강원/경기/경남/대전세종충남으로 제공되어 live raw 기준으로 구성"
+  ]
+}

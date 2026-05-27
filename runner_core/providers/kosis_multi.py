@@ -4,6 +4,7 @@ import pandas as pd
 
 from runner_core.api.kosis_client import fetch_kosis_df
 from runner_core.api_key_store import get_kosis_api_key
+from runner_core.preprocess.transforms import apply_preprocess
 from runner_core.views.builders import build_source_views, build_table_views
 
 
@@ -28,6 +29,14 @@ def run_kosis_multi_job(job: dict) -> Tuple[Any, Any, str]:
         if not src_name:
             raise RuntimeError("Each source needs a non-empty name")
         df = fetch_kosis_df(src, get_kosis_api_key())
+        source_filters = src.get("filters", {})
+        if isinstance(source_filters, dict):
+            for col, val in source_filters.items():
+                if col in df.columns:
+                    vals = val if isinstance(val, list) else [val]
+                    df = df[df[col].astype(str).isin([str(v) for v in vals])]
+        if isinstance(src.get("preprocess"), dict):
+            df = apply_preprocess(df, {"preprocess": src["preprocess"]})
         need = [c for c in merge_keys if c not in df.columns]
         if need:
             raise RuntimeError(f"source '{src_name}' missing merge keys: {need}")

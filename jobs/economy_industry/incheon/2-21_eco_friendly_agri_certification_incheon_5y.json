@@ -1,0 +1,85 @@
+{
+  "job_name": "2-21_친환경농산물인증현황_인천_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "eco_friendly_certification",
+      "orgId": "101",
+      "tblId": "DT_1YL20121",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T10 T20 T30 T40",
+      "objL1": "ALL",
+      "objL2": "101",
+      "filters": {
+        "C1_NM": [
+          "인천광역시 소계"
+        ],
+        "C2_NM": [
+          "계"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023",
+          "2024"
+        ]
+      }
+    }
+  ],
+  "output_subdir": "economy_industry/incheon",
+  "output_prefix": "2-21_친환경농산물인증현황_인천_최근5년",
+  "views": [
+    {
+      "source": "eco_friendly_certification",
+      "kind": "row_timeseries",
+      "sheet_name": "TABLE_VIEW",
+      "row_key_col": "ITM_ID",
+      "row_label_col": "ITM_NM",
+      "row_order": [
+        "T10",
+        "T20",
+        "T30",
+        "T40"
+      ],
+      "group_label": "",
+      "item_label": "항목",
+      "group_value": "",
+      "years": [
+        "2020",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "year_label_map": {
+        "2020": "2020년",
+        "2021": "2021년",
+        "2022": "2022년",
+        "2023": "2023년",
+        "2024": "2024년"
+      },
+      "value_round_map": {
+        "T10": 0,
+        "T20": 0,
+        "T30": 2,
+        "T40": 2
+      },
+      "repeat_group_label": false
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "maintenance_review_20260528": [
+    "경제산업 참고 엑셀 2-21 탭 기준으로 인천 친환경 농산물 인증현황 표를 최근 5년으로 구성",
+    "사용자 제공 원천 DT_1YL20121에서 인증별 계(objL2=101, C2_NM=계)와 인천광역시 소계만 사용",
+    "건수와 농가수는 정수, 면적과 출하량은 소수 둘째 자리까지 표시"
+  ]
+}

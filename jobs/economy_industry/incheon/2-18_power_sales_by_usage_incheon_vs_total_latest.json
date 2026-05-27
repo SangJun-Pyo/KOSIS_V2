@@ -1,0 +1,246 @@
+{
+  "job_name": "2-18_용도별_판매전력량_전국인천비교_최신연도",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "power_sales_usage",
+      "orgId": "310",
+      "tblId": "DT_31002_A006",
+      "prdSe": "Y",
+      "startPrdDe": "2024",
+      "endPrdDe": "2024",
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "TOTAL INCHEON",
+      "objL1": "ALL",
+      "filters": {
+        "PRD_DE": [
+          "2024"
+        ]
+      },
+      "replace_values": {
+        "C1_NM": {
+          "합계": "계",
+          "의복모피": "의복,모피",
+          "가죽가방": "가죽,가방",
+          "목재나무": "목재,나무",
+          "인쇄매체": "인쇄,매체",
+          "연탄석유": "연탄,석유",
+          "의료의약": "의료,의약",
+          "의료광학": "의료,광학",
+          "전자통신": "전자,통신"
+        },
+        "ITM_NM": {
+          "계": "계",
+          "인천": "인천"
+        }
+      }
+    }
+  ],
+  "output_subdir": "economy_industry/incheon",
+  "output_prefix": "2-18_용도별_판매전력량_전국인천비교_최신연도",
+  "views": [
+    {
+      "source": "power_sales_usage",
+      "kind": "dual_label_latest_compare",
+      "sheet_name": "TABLE_VIEW",
+      "row_key_col": "C1_NM",
+      "metric_col": "ITM_NM",
+      "period": "2024",
+      "group_label": "구분",
+      "detail_label": "세부업종",
+      "metric_order": [
+        "계",
+        "인천"
+      ],
+      "metric_label_map": {
+        "계": "전국",
+        "인천": "인천"
+      },
+      "value_round_map": {
+        "계": 0,
+        "인천": 0
+      },
+      "share": {
+        "label": "전국대비 비중",
+        "numerator_metric": "인천",
+        "denominator_metric": "계",
+        "round": 1,
+        "as_percent": true
+      },
+      "entries": [
+        {
+          "key": "계",
+          "group": "계",
+          "detail": ""
+        },
+        {
+          "key": "가정용",
+          "group": "가정용",
+          "detail": ""
+        },
+        {
+          "key": "공공용",
+          "group": "공공용",
+          "detail": ""
+        },
+        {
+          "key": "서비스업",
+          "group": "서비스업",
+          "detail": ""
+        },
+        {
+          "key": "농림어업",
+          "group": "농림어업",
+          "detail": ""
+        },
+        {
+          "key": "광업",
+          "group": "광업",
+          "detail": ""
+        },
+        {
+          "key": "제조업(10차)",
+          "group": "제조업(10차)",
+          "detail": "소계"
+        },
+        {
+          "key": "식료품",
+          "group": "",
+          "detail": "식료품"
+        },
+        {
+          "key": "음료",
+          "group": "",
+          "detail": "음료"
+        },
+        {
+          "key": "담배",
+          "group": "",
+          "detail": "담배"
+        },
+        {
+          "key": "섬유제품",
+          "group": "",
+          "detail": "섬유제품"
+        },
+        {
+          "key": "의복,모피",
+          "group": "",
+          "detail": "의복,모피"
+        },
+        {
+          "key": "가죽,가방",
+          "group": "",
+          "detail": "가죽,가방"
+        },
+        {
+          "key": "목재,나무",
+          "group": "",
+          "detail": "목재,나무"
+        },
+        {
+          "key": "펄프종이",
+          "group": "",
+          "detail": "펄프,종이"
+        },
+        {
+          "key": "인쇄,매체",
+          "group": "",
+          "detail": "인쇄,매체"
+        },
+        {
+          "key": "연탄,석유",
+          "group": "",
+          "detail": "연탄,석유"
+        },
+        {
+          "key": "화학",
+          "group": "",
+          "detail": "화학"
+        },
+        {
+          "key": "의료,의약",
+          "group": "",
+          "detail": "의료,의약"
+        },
+        {
+          "key": "플라스틱",
+          "group": "",
+          "detail": "플라스틱"
+        },
+        {
+          "key": "비금속",
+          "group": "",
+          "detail": "비금속"
+        },
+        {
+          "key": "1차금속",
+          "group": "",
+          "detail": "1차금속"
+        },
+        {
+          "key": "금속가공",
+          "group": "",
+          "detail": "금속가공"
+        },
+        {
+          "key": "전자,통신",
+          "group": "",
+          "detail": "전자,통신"
+        },
+        {
+          "key": "의료,광학",
+          "group": "",
+          "detail": "의료,광학"
+        },
+        {
+          "key": "전기장비",
+          "group": "",
+          "detail": "전기장비"
+        },
+        {
+          "key": "기타기계",
+          "group": "",
+          "detail": "기타기계"
+        },
+        {
+          "key": "자동차",
+          "group": "",
+          "detail": "자동차"
+        },
+        {
+          "key": "기타운송",
+          "group": "",
+          "detail": "기타운송"
+        },
+        {
+          "key": "가구",
+          "group": "",
+          "detail": "가구"
+        },
+        {
+          "key": "기타제품",
+          "group": "",
+          "detail": "기타제품"
+        },
+        {
+          "key": "산업기계",
+          "group": "",
+          "detail": "산업기계"
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "maintenance_review_20260528": [
+    "경제산업 참고 엑셀 2-18 탭 기준으로 행정구역별 용도별 판매전력량 표를 전국과 인천 비교 형태로 구성",
+    "사용자 제공 원천 DT_31002_A006에서 2024년 최신 연도만 사용",
+    "제조업(10차)은 소계와 세부 업종을 분리하고 전국대비 인천 비중을 함께 계산"
+  ]
+}

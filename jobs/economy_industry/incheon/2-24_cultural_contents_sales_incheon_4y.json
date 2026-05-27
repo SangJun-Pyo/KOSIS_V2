@@ -1,0 +1,237 @@
+{
+  "job_name": "2-24_문화콘텐츠업_매출액_인천_최근4년",
+  "provider": "kosis_multi",
+  "sources": [
+    {
+      "name": "sales_national_total",
+      "orgId": "113",
+      "tblId": "DT_113_STBL_1024763",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103843948T1",
+      "objL1": "ALL",
+      "filters": {
+        "C1_NM": [
+          "합계"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      }
+    },
+    {
+      "name": "sales_incheon_total",
+      "orgId": "113",
+      "tblId": "DT_113_STBL_1024763",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103843948T1",
+      "objL1": "ALL",
+      "filters": {
+        "C1_NM": [
+          "인천"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      }
+    },
+    {
+      "name": "sales_categories",
+      "orgId": "113",
+      "tblId": "DT_113_STBL_1024763",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103843948T2 13103843948T3 13103843948T4 13103843948T5 13103843948T6 13103843948T7 13103843948T8 13103843948T9 13103843948T10 13103843948T11 13103843948T12",
+      "objL1": "ALL",
+      "filters": {
+        "C1_NM": [
+          "인천"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      },
+      "replace_values": {
+        "ITM_NM": {
+          "콘텐츠솔루션": "콘텐츠 솔루션"
+        }
+      }
+    }
+  ],
+  "merge_keys": [
+    "PRD_DE"
+  ],
+  "metrics": [
+    {
+      "id": "sales_national",
+      "source": "sales_national_total",
+      "label": "매출액_전국"
+    },
+    {
+      "id": "sales_incheon",
+      "source": "sales_incheon_total",
+      "label": "매출액_인천"
+    },
+    {
+      "id": "sales_share",
+      "formula": "(sales_incheon / sales_national) * 100",
+      "round": 1,
+      "label": "매출액_전국대비 비중"
+    }
+  ],
+  "output_subdir": "economy_industry/incheon",
+  "output_prefix": "2-24_문화콘텐츠업_매출액_인천_최근4년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "source": "metrics",
+          "kind": "row_timeseries",
+          "filters": {
+            "METRIC": [
+              "매출액_전국",
+              "매출액_인천"
+            ]
+          },
+          "replace_values": {
+            "METRIC": {
+              "매출액_전국": "전국",
+              "매출액_인천": "인천"
+            }
+          },
+          "row_key_col": "METRIC",
+          "row_label_col": "METRIC",
+          "row_order": [
+            "전국",
+            "인천"
+          ],
+          "group_label": "",
+          "item_label": "구분",
+          "group_value": "",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ],
+          "year_label_map": {
+            "2020": "2020년",
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년"
+          },
+          "value_round": 0,
+          "repeat_group_label": false,
+          "blank_rows": 0
+        },
+        {
+          "source": "sales_categories",
+          "kind": "row_timeseries",
+          "replace_values": {
+            "ITM_NM": {
+              "콘텐츠솔루션": "콘텐츠 솔루션"
+            }
+          },
+          "row_key_col": "ITM_ID",
+          "row_label_col": "ITM_NM",
+          "row_order": [
+            "13103843948T2",
+            "13103843948T3",
+            "13103843948T4",
+            "13103843948T5",
+            "13103843948T6",
+            "13103843948T7",
+            "13103843948T8",
+            "13103843948T9",
+            "13103843948T10",
+            "13103843948T11",
+            "13103843948T12"
+          ],
+          "group_label": "",
+          "item_label": "구분",
+          "group_value": "",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ],
+          "year_label_map": {
+            "2020": "2020년",
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년"
+          },
+          "value_round": 0,
+          "repeat_group_label": false,
+          "blank_rows": 0
+        },
+        {
+          "source": "metrics",
+          "kind": "row_timeseries",
+          "filters": {
+            "METRIC": [
+              "매출액_전국대비 비중"
+            ]
+          },
+          "replace_values": {
+            "METRIC": {
+              "매출액_전국대비 비중": "전국대비 비중"
+            }
+          },
+          "row_key_col": "METRIC",
+          "row_label_col": "METRIC",
+          "row_order": [
+            "전국대비 비중"
+          ],
+          "group_label": "",
+          "item_label": "구분",
+          "group_value": "",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ],
+          "year_label_map": {
+            "2020": "2020년",
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년"
+          },
+          "value_round": 1,
+          "repeat_group_label": false,
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "maintenance_review_20260528": [
+    "경제산업 참고 엑셀 2-24 탭 기준으로 문화콘텐츠업 인천 매출액 표를 최근 4년으로 구성",
+    "사용자 제공 원천 DT_113_STBL_1024763에서 전국 합계, 인천 합계, 인천 장르별 매출액을 사용",
+    "전국대비 비중은 raw 비중 항목 대신 인천/전국 계산값으로 맞춤"
+  ]
+}

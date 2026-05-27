@@ -4,7 +4,8 @@ import pandas as pd
 
 from runner_core.api.kosis_client import fetch_kosis_df
 from runner_core.api_key_store import get_kosis_api_key
-from runner_core.preprocess.filters import apply_row_filters
+from runner_core.preprocess.filters import apply_row_filters, apply_value_maps
+from runner_core.preprocess.transforms import apply_preprocess
 from runner_core.views.builders import build_source_views
 
 
@@ -21,7 +22,12 @@ def run_kosis_sources_job(job: dict) -> Tuple[Any, Any, str]:
         src_name = str(src.get("name", "")).strip()
         if not src_name:
             raise RuntimeError("Each source needs a non-empty name")
-        src_raw_frames[src_name] = fetch_kosis_df(src, api_key)
+        d = fetch_kosis_df(src, api_key)
+        d = apply_row_filters(d, src.get("filters", {}))
+        if isinstance(src.get("preprocess"), dict):
+            d = apply_preprocess(d, {"preprocess": src["preprocess"]})
+        d = apply_value_maps(d, src)
+        src_raw_frames[src_name] = d
 
     pivot_views = build_source_views(src_raw_frames, job)
     sheet_name = next(iter(pivot_views), "TABLE_VIEW")

@@ -1,0 +1,100 @@
+{
+  "job_name": "2-08_규모별_구인_미충원_비중_인천_최신반기",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "size_status",
+      "orgId": "118",
+      "tblId": "DT_118N_DEN051",
+      "prdSe": "H",
+      "newEstPrdCnt": 1,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103110321DD_2 13103110321DD_4",
+      "objL1": "ALL",
+      "objL2": "ALL",
+      "objL3": "200826INDUSTRY_10S000",
+      "filters": {
+        "C1_NM": [
+          "인천광역시"
+        ],
+        "PRD_DE": [
+          "202502"
+        ],
+        "C3_NM": [
+          "전산업"
+        ],
+        "C2_NM": [
+          "전규모(1인이상)",
+          "0규모(5인미만)",
+          "1규모(5~9인)",
+          "2규모(10~29인)",
+          "3규모(30~99인)",
+          "4규모(100~299인)",
+          "5규모(300인이상)"
+        ]
+      }
+    }
+  ],
+  "output_subdir": "economy_industry/incheon",
+  "output_prefix": "2-08_규모별_구인_미충원_비중_인천_최신반기",
+  "views": [
+    {
+      "kind": "latest_metric_share_summary",
+      "source": "size_status",
+      "sheet_name": "TABLE_VIEW",
+      "category_col": "C2_NM",
+      "period": "202502",
+      "row_label": "구분",
+      "share_base_category": "전규모(1인이상)",
+      "share_as_percent": true,
+      "category_order": [
+        "전규모(1인이상)",
+        "0규모(5인미만)",
+        "1규모(5~9인)",
+        "2규모(10~29인)",
+        "3규모(30~99인)",
+        "4규모(100~299인)",
+        "5규모(300인이상)"
+      ],
+      "category_alias_map": {
+        "전규모(1인이상)": "계"
+      },
+      "metrics": [
+        {
+          "filters": {
+            "ITM_ID": [
+              "13103110321DD_2"
+            ]
+          },
+          "value_label": "구인인원수",
+          "share_label": "규모별비중(구인, %)",
+          "value_round": 0,
+          "share_round": 1
+        },
+        {
+          "filters": {
+            "ITM_ID": [
+              "13103110321DD_4"
+            ]
+          },
+          "value_label": "미충원인원수",
+          "share_label": "규모별비중(미충원, %)",
+          "value_round": 0,
+          "share_round": 1
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "maintenance_review_20260528": [
+    "경제산업 참고 엑셀 2-8 탭 기준으로 인천광역시 전산업의 규모별 구인인원과 미충원인원 및 각 비중 구성",
+    "원천은 DT_118N_DEN051이며 2025.2/2(202502) 데이터를 사용",
+    "규모별 비중은 전규모(1인이상) 대비 각 규모 값의 비중을 퍼센트로 계산"
+  ]
+}

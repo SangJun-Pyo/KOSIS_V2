@@ -1,0 +1,333 @@
+{
+  "job_name": "2-23_문화콘텐츠업_업체수_종사자수_인천_최근4년",
+  "provider": "kosis_multi",
+  "sources": [
+    {
+      "name": "business_national_total",
+      "orgId": "113",
+      "tblId": "DT_113_STBL_1025106",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103860793T1",
+      "objL1": "ALL",
+      "filters": {
+        "C1_NM": [
+          "합계"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      }
+    },
+    {
+      "name": "business_incheon_total",
+      "orgId": "113",
+      "tblId": "DT_113_STBL_1025106",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103860793T1",
+      "objL1": "ALL",
+      "filters": {
+        "C1_NM": [
+          "인천"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      }
+    },
+    {
+      "name": "business_categories",
+      "orgId": "113",
+      "tblId": "DT_113_STBL_1025106",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103860793T2 13103860793T3 13103860793T4 13103860793T5 13103860793T6 13103860793T7 13103860793T8 13103860793T9 13103860793T10 13103860793T11 13103860793T12",
+      "objL1": "ALL",
+      "filters": {
+        "C1_NM": [
+          "인천"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      }
+    },
+    {
+      "name": "employee_national_total",
+      "orgId": "113",
+      "tblId": "DT_113_STBL_1024797",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103843927T1",
+      "objL1": "ALL",
+      "filters": {
+        "C1_NM": [
+          "합계"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      }
+    },
+    {
+      "name": "employee_incheon_total",
+      "orgId": "113",
+      "tblId": "DT_113_STBL_1024797",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "13103843927T1",
+      "objL1": "ALL",
+      "filters": {
+        "C1_NM": [
+          "인천"
+        ],
+        "PRD_DE": [
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ]
+      }
+    }
+  ],
+  "merge_keys": [
+    "PRD_DE"
+  ],
+  "metrics": [
+    {
+      "id": "biz_national",
+      "source": "business_national_total",
+      "label": "사업체수_전국"
+    },
+    {
+      "id": "biz_incheon",
+      "source": "business_incheon_total",
+      "label": "사업체수_인천"
+    },
+    {
+      "id": "biz_share",
+      "formula": "(biz_incheon / biz_national) * 100",
+      "round": 1,
+      "label": "사업체수_전국대비 비중"
+    },
+    {
+      "id": "emp_national",
+      "source": "employee_national_total",
+      "label": "종사자수_전국"
+    },
+    {
+      "id": "emp_incheon",
+      "source": "employee_incheon_total",
+      "label": "종사자수_인천"
+    },
+    {
+      "id": "emp_share",
+      "formula": "(emp_incheon / emp_national) * 100",
+      "round": 1,
+      "label": "종사자수_전국대비 비중"
+    }
+  ],
+  "output_subdir": "economy_industry/incheon",
+  "output_prefix": "2-23_문화콘텐츠업_업체수_종사자수_인천_최근4년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "source": "metrics",
+          "kind": "row_timeseries",
+          "filters": {
+            "METRIC": [
+              "사업체수_전국",
+              "사업체수_인천"
+            ]
+          },
+          "replace_values": {
+            "METRIC": {
+              "사업체수_전국": "전국",
+              "사업체수_인천": "인천"
+            }
+          },
+          "row_key_col": "METRIC",
+          "row_label_col": "METRIC",
+          "row_order": [
+            "전국",
+            "인천"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "사업체수",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ],
+          "year_label_map": {
+            "2020": "2020년",
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년"
+          },
+          "value_round": 0,
+          "repeat_group_label": false,
+          "blank_rows": 0
+        },
+        {
+          "source": "business_categories",
+          "kind": "row_timeseries",
+          "row_key_col": "ITM_ID",
+          "row_label_col": "ITM_NM",
+          "row_order": [
+            "13103860793T2",
+            "13103860793T3",
+            "13103860793T4",
+            "13103860793T5",
+            "13103860793T6",
+            "13103860793T7",
+            "13103860793T8",
+            "13103860793T9",
+            "13103860793T10",
+            "13103860793T11",
+            "13103860793T12"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ],
+          "year_label_map": {
+            "2020": "2020년",
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년"
+          },
+          "value_round": 0,
+          "repeat_group_label": false,
+          "blank_rows": 0
+        },
+        {
+          "source": "metrics",
+          "kind": "row_timeseries",
+          "filters": {
+            "METRIC": [
+              "사업체수_전국대비 비중"
+            ]
+          },
+          "replace_values": {
+            "METRIC": {
+              "사업체수_전국대비 비중": "전국대비 비중"
+            }
+          },
+          "row_key_col": "METRIC",
+          "row_label_col": "METRIC",
+          "row_order": [
+            "전국대비 비중"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ],
+          "year_label_map": {
+            "2020": "2020년",
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년"
+          },
+          "value_round": 1,
+          "repeat_group_label": false,
+          "blank_rows": 0
+        },
+        {
+          "source": "metrics",
+          "kind": "row_timeseries",
+          "filters": {
+            "METRIC": [
+              "종사자수_전국",
+              "종사자수_인천",
+              "종사자수_전국대비 비중"
+            ]
+          },
+          "replace_values": {
+            "METRIC": {
+              "종사자수_전국": "전국",
+              "종사자수_인천": "인천",
+              "종사자수_전국대비 비중": "전국대비 비중"
+            }
+          },
+          "row_key_col": "METRIC",
+          "row_label_col": "METRIC",
+          "row_order": [
+            "전국",
+            "인천",
+            "전국대비 비중"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "종사자수",
+          "years": [
+            "2020",
+            "2021",
+            "2022",
+            "2023"
+          ],
+          "year_label_map": {
+            "2020": "2020년",
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년"
+          },
+          "value_round": 0,
+          "value_round_map": {
+            "전국대비 비중": 1
+          },
+          "repeat_group_label": false,
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "maintenance_review_20260528": [
+    "경제산업 참고 엑셀 2-23 탭 기준으로 문화콘텐츠업 사업체수와 종사자수 표를 최근 4년으로 구성",
+    "사업체수는 사용자 제공 원천 DT_113_STBL_1025106, 종사자수는 추가 제공 원천 DT_113_STBL_1024797을 사용",
+    "전국대비 비중은 raw 비중 항목 대신 인천/전국 계산값으로 맞춤"
+  ]
+}

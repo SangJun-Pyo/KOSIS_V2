@@ -16,11 +16,17 @@ from runner_core.pivots.ranking import (
 from runner_core.pivots.ratio import make_ratio_timeseries_pivot
 from runner_core.pivots.summary import (
     make_age_distribution_summary_pivot,
+    make_dual_label_latest_compare_pivot,
+    make_dual_label_timeseries_summary_pivot,
     make_group_metric_share_summary_pivot,
+    make_latest_metric_matrix_pivot,
+    make_latest_metric_share_summary_pivot,
     make_metric_block_summary_pivot,
     make_metric_summary_pivot,
     make_paired_metric_latest_compare_pivot,
     make_paired_metric_timeseries_summary_pivot,
+    make_region_year_metric_matrix_pivot,
+    make_row_timeseries_pivot,
     make_single_metric_share_summary_pivot,
 )
 from runner_core.preprocess.filters import apply_row_filters, apply_value_maps
@@ -44,6 +50,9 @@ def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
     if isinstance(spec.get("preprocess"), dict):
         d = apply_preprocess(d, {"preprocess": spec["preprocess"]})
     d = apply_value_maps(d, spec)
+    spec_for_pivot = dict(spec)
+    if kind == "row_timeseries":
+        spec_for_pivot.pop("filters", None)
 
     if kind == "pivot":
         return make_custom_pivot(d, spec)
@@ -85,6 +94,18 @@ def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
         return make_rank_and_metric_block_summary_pivot(d, spec)
     if kind == "age_distribution_summary":
         return make_age_distribution_summary_pivot(d, spec)
+    if kind == "row_timeseries":
+        return make_row_timeseries_pivot(d, spec_for_pivot)
+    if kind == "latest_metric_share_summary":
+        return make_latest_metric_share_summary_pivot(d, spec)
+    if kind == "latest_metric_matrix":
+        return make_latest_metric_matrix_pivot(d, spec)
+    if kind == "dual_label_latest_compare":
+        return make_dual_label_latest_compare_pivot(d, spec)
+    if kind == "dual_label_timeseries_summary":
+        return make_dual_label_timeseries_summary_pivot(d, spec)
+    if kind == "region_year_metric_matrix":
+        return make_region_year_metric_matrix_pivot(d, spec)
     raise RuntimeError(f"unknown view kind: {kind}")
 
 def make_stack_blocks_view(source_frames: Dict[str, pd.DataFrame], spec: dict) -> pd.DataFrame:
@@ -174,6 +195,7 @@ def build_source_views(source_frames: Dict[str, pd.DataFrame], job: dict) -> Dic
                 views[sheet_name] = build_single_source_view(base_df, spec)
         except Exception as e:
             print(f"[WARN] source view 생성 실패 ({sheet_name}): {e}")
+            views[sheet_name] = pd.DataFrame([{"ERROR": f"source view 생성 실패: {e}"}])
 
     return views
 

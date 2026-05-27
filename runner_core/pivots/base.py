@@ -81,6 +81,28 @@ def make_custom_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
         else:
             pv.columns = [str(label_map.get(str(c), c)) for c in pv.columns]
 
+    column_order = pivot_cfg.get("column_order", [])
+    if isinstance(column_order, list) and column_order:
+        wanted = [str(c) for c in column_order]
+        if isinstance(pv.columns, pd.MultiIndex):
+            pass
+        else:
+            existing = [str(c) for c in pv.columns]
+            ordered = [c for c in wanted if c in existing]
+            trailing = [c for c in existing if c not in ordered]
+            pv = pv[ordered + trailing]
+
+    index_order = pivot_cfg.get("index_order", [])
+    if isinstance(index_order, list) and index_order:
+        wanted_idx = [str(x) for x in index_order]
+        if isinstance(pv.index, pd.MultiIndex):
+            pass
+        else:
+            existing_idx = [str(x) for x in pv.index]
+            ordered_idx = [x for x in wanted_idx if x in existing_idx]
+            trailing_idx = [x for x in existing_idx if x not in ordered_idx]
+            pv = pv.reindex(ordered_idx + trailing_idx)
+
     # (옵션) 월 포맷
     if pivot_cfg.get("flatten_columns_year", False):
         def fmt_prd2(x: str) -> str:

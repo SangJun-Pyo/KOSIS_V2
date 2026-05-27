@@ -1,0 +1,94 @@
+{
+  "job_name": "2-10_지역별_창업기업_광역비교_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "startup_companies",
+      "orgId": "142",
+      "tblId": "DT_142N_F204",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "16142T1 T001 T002",
+      "objL1": "ALL",
+      "filters": {
+        "ITM_ID": [
+          "16142T1"
+        ]
+      }
+    }
+  ],
+  "output_subdir": "economy_industry/common",
+  "output_prefix": "2-10_지역별_창업기업_광역비교_최근5년",
+  "views": [
+    {
+      "source": "startup_companies",
+      "kind": "single_metric_share_summary",
+      "sheet_name": "TABLE_VIEW",
+      "region_col": "C1_NM",
+      "area_label": "구분",
+      "national_name": "전국",
+      "national_alias": "계",
+      "years": [
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "2025"
+      ],
+      "share_year": "2025",
+      "include_share": true,
+      "value_round": 0,
+      "cagr_label": "CAGR",
+      "region_order": [
+        "전국",
+        "서울",
+        "부산",
+        "대구",
+        "인천",
+        "광주",
+        "대전",
+        "울산",
+        "세종",
+        "경기",
+        "강원",
+        "충북",
+        "충남",
+        "전북",
+        "전남",
+        "경북",
+        "경남",
+        "제주"
+      ],
+      "subtotals": [
+        {
+          "label": "8개 광역시 평균",
+          "members": [
+            "서울",
+            "부산",
+            "대구",
+            "인천",
+            "광주",
+            "대전",
+            "울산",
+            "세종"
+          ],
+          "agg": "mean",
+          "value_round": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [
+    "전국"
+  ],
+  "maintenance_review_20260528": [
+    "경제산업 참고 엑셀 2-10 탭 기준으로 지역별 창업기업 광역비교표를 최근 5년 기준으로 구성",
+    "원천은 DT_142N_F204이며 전체(16142T1) 지표만 사용",
+    "8개 광역시 평균은 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종의 단순평균으로 계산"
+  ]
+}

@@ -1,0 +1,290 @@
+{
+  "job_name": "2-05_인구천명당사업체수_광역비교_최근4년",
+  "provider": "kosis_multi",
+  "sources": [
+    {
+      "name": "national",
+      "orgId": "101",
+      "tblId": "DT_1YL20842",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "itmId": "T10 T001 T002",
+      "objL1": "00",
+      "preprocess": {
+        "compose_column": {
+          "target": "C1_NM",
+          "template": "전국"
+        }
+      }
+    },
+    {
+      "name": "incheon",
+      "orgId": "101",
+      "tblId": "DT_1YL20842",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "itmId": "T10 T001 T002",
+      "objL1": "23",
+      "preprocess": {
+        "compose_column": {
+          "target": "C1_NM",
+          "template": "인천광역시"
+        }
+      }
+    },
+    {
+      "name": "metro_sum",
+      "orgId": "101",
+      "tblId": "DT_1YL20842",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "itmId": "T10 T001 T002",
+      "objL1": "11 21 22 23 24 25 26 29",
+      "preprocess": {
+        "category_map_aggregate": {
+          "source": "C1_NM",
+          "target": "C1_NM",
+          "mapping": {
+            "서울특별시": "8개 광역시 평균",
+            "부산광역시": "8개 광역시 평균",
+            "대구광역시": "8개 광역시 평균",
+            "인천광역시": "8개 광역시 평균",
+            "광주광역시": "8개 광역시 평균",
+            "대전광역시": "8개 광역시 평균",
+            "울산광역시": "8개 광역시 평균",
+            "세종특별자치시": "8개 광역시 평균"
+          },
+          "keep_unmapped": false,
+          "agg": "sum",
+          "group_cols": [
+            "ITM_ID",
+            "ITM_NM",
+            "PRD_DE",
+            "C1_NM"
+          ]
+        }
+      }
+    }
+  ],
+  "merge_keys": [
+    "C1_NM",
+    "PRD_DE"
+  ],
+  "metrics": [
+    {
+      "id": "ratio",
+      "source": "national",
+      "source_filter": {
+        "ITM_ID": "T10"
+      },
+      "label": "인구천명당 사업체수(A÷B×1,000) (개)"
+    },
+    {
+      "id": "biz",
+      "source": "national",
+      "source_filter": {
+        "ITM_ID": "T001"
+      },
+      "label": "사업체수(A) (개)"
+    },
+    {
+      "id": "pop",
+      "source": "national",
+      "source_filter": {
+        "ITM_ID": "T002"
+      },
+      "label": "주민등록인구(B) (명)"
+    },
+    {
+      "id": "ratio_incheon",
+      "source": "incheon",
+      "source_filter": {
+        "ITM_ID": "T10"
+      },
+      "label": "인구천명당 사업체수(A÷B×1,000) (개)"
+    },
+    {
+      "id": "biz_incheon",
+      "source": "incheon",
+      "source_filter": {
+        "ITM_ID": "T001"
+      },
+      "label": "사업체수(A) (개)"
+    },
+    {
+      "id": "pop_incheon",
+      "source": "incheon",
+      "source_filter": {
+        "ITM_ID": "T002"
+      },
+      "label": "주민등록인구(B) (명)"
+    },
+    {
+      "id": "metro_sum_biz",
+      "source": "metro_sum",
+      "source_filter": {
+        "ITM_ID": "T001"
+      },
+      "label": "8개 광역시 합산 사업체수"
+    },
+    {
+      "id": "metro_sum_pop",
+      "source": "metro_sum",
+      "source_filter": {
+        "ITM_ID": "T002"
+      },
+      "label": "8개 광역시 합산 주민등록인구"
+    },
+    {
+      "id": "metro_avg_biz",
+      "formula": "metro_sum_biz / 8",
+      "label": "사업체수(A) (개)"
+    },
+    {
+      "id": "metro_avg_pop",
+      "formula": "metro_sum_pop / 8",
+      "label": "주민등록인구(B) (명)"
+    },
+    {
+      "id": "metro_avg_ratio",
+      "formula": "(metro_avg_biz / metro_avg_pop) * 1000",
+      "label": "인구천명당 사업체수(A÷B×1,000) (개)"
+    }
+  ],
+  "output_subdir": "economy_industry/incheon",
+  "output_prefix": "2-05_인구천명당사업체수_광역비교_최근4년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "source": "metrics",
+          "kind": "row_timeseries",
+          "blank_rows": 0,
+          "filters": {
+            "C1_NM": [
+              "전국"
+            ],
+            "METRIC": [
+              "인구천명당 사업체수(A÷B×1,000) (개)",
+              "사업체수(A) (개)",
+              "주민등록인구(B) (명)"
+            ]
+          },
+          "row_key_col": "METRIC",
+          "row_label_col": "METRIC",
+          "row_order": [
+            "인구천명당 사업체수(A÷B×1,000) (개)",
+            "사업체수(A) (개)",
+            "주민등록인구(B) (명)"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "전국",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024"
+          ],
+          "year_label_map": {
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년",
+            "2024": "2024년"
+          },
+          "value_round": 0,
+          "repeat_group_label": false
+        },
+        {
+          "source": "metrics",
+          "kind": "row_timeseries",
+          "blank_rows": 0,
+          "filters": {
+            "C1_NM": [
+              "인천광역시"
+            ],
+            "METRIC": [
+              "인구천명당 사업체수(A÷B×1,000) (개)",
+              "사업체수(A) (개)",
+              "주민등록인구(B) (명)"
+            ]
+          },
+          "row_key_col": "METRIC",
+          "row_label_col": "METRIC",
+          "row_order": [
+            "인구천명당 사업체수(A÷B×1,000) (개)",
+            "사업체수(A) (개)",
+            "주민등록인구(B) (명)"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "인천광역시",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024"
+          ],
+          "year_label_map": {
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년",
+            "2024": "2024년"
+          },
+          "value_round": 0,
+          "repeat_group_label": false
+        },
+        {
+          "source": "metrics",
+          "kind": "row_timeseries",
+          "blank_rows": 0,
+          "filters": {
+            "C1_NM": [
+              "8개 광역시 평균"
+            ],
+            "METRIC": [
+              "인구천명당 사업체수(A÷B×1,000) (개)",
+              "사업체수(A) (개)",
+              "주민등록인구(B) (명)"
+            ]
+          },
+          "row_key_col": "METRIC",
+          "row_label_col": "METRIC",
+          "row_order": [
+            "인구천명당 사업체수(A÷B×1,000) (개)",
+            "사업체수(A) (개)",
+            "주민등록인구(B) (명)"
+          ],
+          "group_label": "구분",
+          "item_label": "항목",
+          "group_value": "8개 광역시 평균",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024"
+          ],
+          "year_label_map": {
+            "2021": "2021년",
+            "2022": "2022년",
+            "2023": "2023년",
+            "2024": "2024년"
+          },
+          "value_round": 0,
+          "repeat_group_label": false
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "maintenance_review_20260528": [
+    "참고 엑셀 2-5 탭 기준으로 전국, 인천광역시, 8개 광역시 평균 3블록 구성",
+    "8개 광역시 평균은 서울/부산/대구/인천/광주/대전/울산/세종 합산 후 사업체수와 주민등록인구를 8로 나누어 계산"
+  ]
+}

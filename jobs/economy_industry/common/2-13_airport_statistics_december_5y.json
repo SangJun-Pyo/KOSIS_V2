@@ -1,0 +1,263 @@
+{
+  "job_name": "2-13_공항별_통계_12월기준_최근5개년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "airport_stats",
+      "orgId": "381",
+      "tblId": "DT_920005_B001",
+      "prdSe": "M",
+      "startPrdDe": "202112",
+      "endPrdDe": "202512",
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T001 T002 T003",
+      "objL1": "ALL",
+      "objL2": "ALL",
+      "filters": {
+        "C2_NM": [
+          "계"
+        ],
+        "PRD_DE": [
+          "202112",
+          "202212",
+          "202312",
+          "202412",
+          "202512"
+        ]
+      },
+      "preprocess": {
+        "category_map_aggregate": {
+          "source": "C1_NM",
+          "target": "AIRPORT_LABEL",
+          "agg": "sum",
+          "keep_unmapped": true,
+          "mapping": {
+            "청주": "기타소계",
+            "대구": "기타소계",
+            "무안": "기타소계",
+            "양양": "기타소계",
+            "광주": "기타소계",
+            "울산": "기타소계",
+            "여수": "기타소계",
+            "포항경주": "기타소계",
+            "사천": "기타소계",
+            "군산": "기타소계",
+            "원주": "기타소계"
+          },
+          "group_cols": [
+            "ITM_ID",
+            "ITM_NM",
+            "C2_NM",
+            "PRD_DE",
+            "AIRPORT_LABEL"
+          ]
+        }
+      },
+      "replace_values": {
+        "AIRPORT_LABEL": {
+          "합계": "전체"
+        },
+        "PRD_DE": {
+          "202112": "2021",
+          "202212": "2022",
+          "202312": "2023",
+          "202412": "2024",
+          "202512": "2025"
+        }
+      }
+    }
+  ],
+  "output_subdir": "economy_industry/common",
+  "output_prefix": "2-13_공항별_통계_12월기준_최근5개년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "source": "airport_stats",
+          "kind": "dual_label_timeseries_summary",
+          "filters": {
+            "ITM_ID": [
+              "T001"
+            ]
+          },
+          "row_key_col": "AIRPORT_LABEL",
+          "group_label": "구분",
+          "detail_label": "공항별",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "share_year": "2025",
+          "share_base_key": "전체",
+          "include_share": true,
+          "value_round": 0,
+          "cagr_label": "CAGR",
+          "entries": [
+            {
+              "key": "전체",
+              "group": "운항 (편)",
+              "detail": "전체"
+            },
+            {
+              "key": "인천",
+              "group": "",
+              "detail": "인천"
+            },
+            {
+              "key": "김포",
+              "group": "",
+              "detail": "김포"
+            },
+            {
+              "key": "김해",
+              "group": "",
+              "detail": "김해"
+            },
+            {
+              "key": "제주",
+              "group": "",
+              "detail": "제주"
+            },
+            {
+              "key": "기타소계",
+              "group": "",
+              "detail": "기타소계"
+            }
+          ],
+          "blank_rows": 0
+        },
+        {
+          "source": "airport_stats",
+          "kind": "dual_label_timeseries_summary",
+          "filters": {
+            "ITM_ID": [
+              "T002"
+            ]
+          },
+          "row_key_col": "AIRPORT_LABEL",
+          "group_label": "구분",
+          "detail_label": "공항별",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "share_year": "2025",
+          "share_base_key": "전체",
+          "include_share": true,
+          "value_round": 0,
+          "cagr_label": "CAGR",
+          "entries": [
+            {
+              "key": "전체",
+              "group": "여객 (명)",
+              "detail": "전체"
+            },
+            {
+              "key": "인천",
+              "group": "",
+              "detail": "인천"
+            },
+            {
+              "key": "김포",
+              "group": "",
+              "detail": "김포"
+            },
+            {
+              "key": "김해",
+              "group": "",
+              "detail": "김해"
+            },
+            {
+              "key": "제주",
+              "group": "",
+              "detail": "제주"
+            },
+            {
+              "key": "기타소계",
+              "group": "",
+              "detail": "기타소계"
+            }
+          ],
+          "blank_rows": 0
+        },
+        {
+          "source": "airport_stats",
+          "kind": "dual_label_timeseries_summary",
+          "filters": {
+            "ITM_ID": [
+              "T003"
+            ]
+          },
+          "row_key_col": "AIRPORT_LABEL",
+          "group_label": "구분",
+          "detail_label": "공항별",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "share_year": "2025",
+          "share_base_key": "전체",
+          "include_share": true,
+          "value_round": 0,
+          "cagr_label": "CAGR",
+          "entries": [
+            {
+              "key": "전체",
+              "group": "화물 (톤)",
+              "detail": "전체"
+            },
+            {
+              "key": "인천",
+              "group": "",
+              "detail": "인천"
+            },
+            {
+              "key": "김포",
+              "group": "",
+              "detail": "김포"
+            },
+            {
+              "key": "김해",
+              "group": "",
+              "detail": "김해"
+            },
+            {
+              "key": "제주",
+              "group": "",
+              "detail": "제주"
+            },
+            {
+              "key": "기타소계",
+              "group": "",
+              "detail": "기타소계"
+            }
+          ],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [
+    "전국"
+  ],
+  "maintenance_review_20260528": [
+    "경제산업 참고 엑셀 2-13 탭 기준으로 공항별 통계를 최근 5개년 12월 기준으로 구성",
+    "원천은 DT_920005_B001이며 2021.12~2025.12만 사용",
+    "기타소계는 청주, 대구, 무안, 양양, 광주, 울산, 여수, 포항경주, 사천, 군산, 원주를 합산"
+  ]
+}

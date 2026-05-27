@@ -495,6 +495,7 @@ def make_single_metric_share_summary_pivot(
     value_round = pivot_cfg.get("value_round")
     value_round = int(value_round) if value_round is not None else None
     value_round_map = {str(k): int(v) for k, v in pivot_cfg.get("value_round_map", {}).items()}
+    include_cagr = bool(pivot_cfg.get("include_cagr", True))
     cagr_label = str(pivot_cfg.get("cagr_label", f"CAGR('{years[0][2:]}~'{years[-1][2:]})"))
     periods = max(int(years[-1]) - int(years[0]), 1)
     region_order = [str(x) for x in pivot_cfg.get("region_order", [])]
@@ -503,6 +504,8 @@ def make_single_metric_share_summary_pivot(
 
     share_base_filters = pivot_cfg.get("share_base_filters", {})
     share_base_year = str(pivot_cfg.get("share_base_year", share_year))
+    share_exclude_regions = {str(x) for x in pivot_cfg.get("share_exclude_regions", [])}
+    share_exclude_placeholder = pivot_cfg.get("share_exclude_placeholder", pd.NA)
     if include_share and isinstance(share_base_filters, dict) and share_base_filters:
         base_df = share_base_df.copy() if share_base_df is not None else df.copy()
         base_df["PRD_DE"] = base_df["PRD_DE"].astype(str)
@@ -533,11 +536,14 @@ def make_single_metric_share_summary_pivot(
         start_val = pd.to_numeric(rec.get(years[0]), errors="coerce")
         end_val = pd.to_numeric(rec.get(years[-1]), errors="coerce")
         if include_share:
-            row["비중"] = (
-                round((latest_val / national_val) * 100, 1)
-                if pd.notna(latest_val) and pd.notna(national_val) and national_val not in (0, 0.0)
-                else pd.NA
-            )
+            if region in share_exclude_regions:
+                row["비중"] = share_exclude_placeholder
+            else:
+                row["비중"] = (
+                    round((latest_val / national_val) * 100, 1)
+                    if pd.notna(latest_val) and pd.notna(national_val) and national_val not in (0, 0.0)
+                    else pd.NA
+                )
         row[cagr_label] = (
             round((((end_val / start_val) ** (1 / periods)) - 1) * 100, 1)
             if pd.notna(start_val) and pd.notna(end_val) and start_val > 0 and end_val > 0
@@ -572,27 +578,42 @@ def make_single_metric_share_summary_pivot(
                 if pd.notna(latest_val) and pd.notna(national_val) and national_val not in (0, 0.0)
                 else pd.NA
             )
-        row[cagr_label] = (
-            round((((end_val / start_val) ** (1 / periods)) - 1) * 100, 1)
-            if pd.notna(start_val) and pd.notna(end_val) and start_val > 0 and end_val > 0
-            else pd.NA
-        )
+        if include_cagr:
+            row[cagr_label] = (
+                round((((end_val / start_val) ** (1 / periods)) - 1) * 100, 1)
+                if pd.notna(start_val) and pd.notna(end_val) and start_val > 0 and end_val > 0
+                else pd.NA
+            )
         rows.append(row)
 
     columns = [area_label] + [f"{y}년" for y in years]
     if include_share:
         columns.append("비중")
-    columns.append(cagr_label)
+    if include_cagr:
+        columns.append(cagr_label)
     out = pd.DataFrame(rows, columns=columns)
     has_nonint_subtotal = any(
         isinstance(subtotal, dict) and subtotal.get("value_round") not in (None, 0)
         for subtotal in subtotals
     )
-    if value_round == 0 and not preserve_text_values and not value_round_map and not has_nonint_subtotal:
+    if value_round == 0 and not preserve_text_values and not value_round_map:
         for year in years:
             col = f"{year}년"
-            if col in out.columns:
+            if col not in out.columns:
+                continue
+            if not has_nonint_subtotal:
                 out[col] = pd.to_numeric(out[col], errors="coerce").astype("Int64")
+                continue
+            values = pd.to_numeric(out[col], errors="coerce")
+            converted: List[Any] = []
+            for val in values.tolist():
+                if pd.isna(val):
+                    converted.append(pd.NA)
+                elif float(val).is_integer():
+                    converted.append(int(val))
+                else:
+                    converted.append(float(val))
+            out[col] = pd.Series(converted, dtype="object")
     return out
 
 
@@ -709,5 +730,566 @@ def make_group_metric_share_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> 
     if include_share:
         columns.append("비중")
     columns.append(cagr_label)
+    return pd.DataFrame(rows, columns=columns)
+
+
+def make_row_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
+    required = ["PRD_DE", "DT"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"row_timeseries columns missing: {missing}")
+
+    row_key_col = str(pivot_cfg.get("row_key_col", "")).strip()
+    row_label_col = str(pivot_cfg.get("row_label_col", row_key_col)).strip()
+    if not row_key_col or row_key_col not in df.columns:
+        raise RuntimeError("row_timeseries requires valid row_key_col")
+    if not row_label_col or row_label_col not in df.columns:
+        raise RuntimeError("row_timeseries requires valid row_label_col")
+
+    years = [str(y) for y in pivot_cfg.get("years", [])]
+    if not years:
+        raise RuntimeError("row_timeseries requires non-empty years")
+
+    d = df.copy()
+    d["PRD_DE"] = d["PRD_DE"].astype(str)
+    d = d[d["PRD_DE"].isin(years)].copy()
+
+    filters = pivot_cfg.get("filters", {})
+    for col, vals in filters.items():
+        if col in d.columns:
+            d = d[d[col].astype(str).isin([str(v) for v in vals])].copy()
+
+    d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+    d[row_key_col] = d[row_key_col].astype(str)
+    d[row_label_col] = d[row_label_col].astype(str)
+
+    row_order = [str(x) for x in pivot_cfg.get("row_order", [])]
+    if not row_order:
+        row_order = list(dict.fromkeys(d[row_key_col].astype(str)))
+
+    pv = d.pivot_table(
+        index=row_key_col,
+        columns="PRD_DE",
+        values="DT",
+        aggfunc="first",
+        sort=False,
+        observed=True,
+    )
+    for year in years:
+        if year not in pv.columns:
+            pv[year] = pd.NA
+    pv = pv[years]
+
+    if row_key_col == row_label_col:
+        label_map = {key: key for key in d[row_key_col].drop_duplicates().astype(str).tolist()}
+    else:
+        label_map = (
+            d[[row_key_col, row_label_col]]
+            .drop_duplicates()
+            .set_index(row_key_col)[row_label_col]
+            .to_dict()
+        )
+
+    group_label = str(pivot_cfg.get("group_label", "구분"))
+    item_label = str(pivot_cfg.get("item_label", "항목"))
+    group_value = str(pivot_cfg.get("group_value", "")).strip()
+    repeat_group_label = bool(pivot_cfg.get("repeat_group_label", False))
+    include_group_label = bool(group_label)
+    value_round = pivot_cfg.get("value_round")
+    value_round = int(value_round) if value_round is not None else None
+    value_round_map = {str(k): int(v) for k, v in pivot_cfg.get("value_round_map", {}).items()}
+    year_label_map = {str(k): str(v) for k, v in pivot_cfg.get("year_label_map", {}).items()}
+
+    rows: List[Dict[str, Any]] = []
+    first = True
+    for key in row_order:
+        if key not in pv.index:
+            continue
+        rec = pv.loc[key]
+        row: Dict[str, Any] = {item_label: label_map.get(key, key)}
+        if include_group_label:
+            row[group_label] = group_value if (repeat_group_label or first) else ""
+        digits = value_round_map.get(str(key), value_round)
+        for year in years:
+            row[year_label_map.get(year, year)] = _format_rounded_value(rec.get(year), digits)
+        rows.append(row)
+        first = False
+
+    year_columns = [year_label_map.get(year, year) for year in years]
+    columns = ([group_label] if include_group_label else []) + [item_label] + year_columns
+    out = pd.DataFrame(rows, columns=columns)
+    for col in year_columns:
+        if col not in out.columns:
+            continue
+        values = pd.to_numeric(out[col], errors="coerce")
+        converted: List[Any] = []
+        for raw_val, num_val in zip(out[col].tolist(), values.tolist()):
+            if pd.isna(num_val):
+                converted.append(raw_val)
+            elif float(num_val).is_integer():
+                converted.append(int(num_val))
+            else:
+                converted.append(float(num_val))
+        out[col] = pd.Series(converted, dtype="object")
+    return out
+
+
+def make_latest_metric_share_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
+    required = ["PRD_DE", "DT"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"latest_metric_share_summary columns missing: {missing}")
+
+    category_col = str(pivot_cfg.get("category_col", "")).strip()
+    if not category_col or category_col not in df.columns:
+        raise RuntimeError("latest_metric_share_summary requires valid category_col")
+
+    period = str(pivot_cfg.get("period", "")).strip()
+    if not period:
+        raise RuntimeError("latest_metric_share_summary requires period")
+
+    metrics = pivot_cfg.get("metrics", [])
+    if not isinstance(metrics, list) or not metrics:
+        raise RuntimeError("latest_metric_share_summary requires non-empty metrics")
+
+    d = df.copy()
+    d["PRD_DE"] = d["PRD_DE"].astype(str)
+    d = d[d["PRD_DE"] == period].copy()
+
+    filters = pivot_cfg.get("filters", {})
+    for col, vals in filters.items():
+        if col in d.columns:
+            allowed = vals if isinstance(vals, list) else [vals]
+            d = d[d[col].astype(str).isin([str(v) for v in allowed])].copy()
+
+    d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+    d[category_col] = d[category_col].astype(str)
+
+    category_order = [str(x) for x in pivot_cfg.get("category_order", [])]
+    if not category_order:
+        category_order = list(dict.fromkeys(d[category_col].astype(str)))
+
+    row_label = str(pivot_cfg.get("row_label", "구분"))
+    category_alias_map = {str(k): str(v) for k, v in pivot_cfg.get("category_alias_map", {}).items()}
+
+    base_category = str(pivot_cfg.get("share_base_category", "")).strip()
+    share_as_percent = bool(pivot_cfg.get("share_as_percent", True))
+
+    rows: List[Dict[str, Any]] = []
+    for category in category_order:
+        row: Dict[str, Any] = {row_label: category_alias_map.get(category, category)}
+        block_for_row = d[d[category_col].astype(str) == category].copy()
+        if block_for_row.empty:
+            continue
+
+        for metric in metrics:
+            if not isinstance(metric, dict):
+                continue
+            value_label = str(metric.get("value_label", "")).strip()
+            share_label = str(metric.get("share_label", "")).strip()
+            if not value_label:
+                continue
+
+            block = d.copy()
+            metric_filters = metric.get("filters", {})
+            if isinstance(metric_filters, dict):
+                for col, vals in metric_filters.items():
+                    if col in block.columns:
+                        allowed = vals if isinstance(vals, list) else [vals]
+                        block = block[block[col].astype(str).isin([str(v) for v in allowed])].copy()
+
+            metric_series = block.groupby(category_col, as_index=True, dropna=False, observed=True)["DT"].first()
+            value = metric_series.get(category, pd.NA)
+            value_round = metric.get("value_round")
+            value_round = int(value_round) if value_round is not None else None
+            row[value_label] = _format_rounded_value(value, value_round)
+
+            if share_label:
+                base_val = metric_series.get(base_category, pd.NA) if base_category else pd.NA
+                share_round = metric.get("share_round")
+                share_round = int(share_round) if share_round is not None else 1
+                num = pd.to_numeric(value, errors="coerce")
+                den = pd.to_numeric(base_val, errors="coerce")
+                if pd.notna(num) and pd.notna(den) and den not in (0, 0.0):
+                    share = (num / den) * (100 if share_as_percent else 1)
+                    row[share_label] = _format_rounded_value(share, share_round)
+                else:
+                    row[share_label] = pd.NA
+
+        rows.append(row)
+
+    columns = [row_label]
+    for metric in metrics:
+        if not isinstance(metric, dict):
+            continue
+        value_label = str(metric.get("value_label", "")).strip()
+        share_label = str(metric.get("share_label", "")).strip()
+        if value_label:
+            columns.append(value_label)
+        if share_label:
+            columns.append(share_label)
+    return pd.DataFrame(rows, columns=columns)
+
+
+def make_latest_metric_matrix_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
+    required = ["PRD_DE", "DT"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"latest_metric_matrix columns missing: {missing}")
+
+    row_col = str(pivot_cfg.get("row_col", "")).strip()
+    metric_col = str(pivot_cfg.get("metric_col", "")).strip()
+    if not row_col or row_col not in df.columns:
+        raise RuntimeError("latest_metric_matrix requires valid row_col")
+    if not metric_col or metric_col not in df.columns:
+        raise RuntimeError("latest_metric_matrix requires valid metric_col")
+
+    period = str(pivot_cfg.get("period", "")).strip()
+    if not period:
+        raise RuntimeError("latest_metric_matrix requires period")
+
+    d = df.copy()
+    d["PRD_DE"] = d["PRD_DE"].astype(str)
+    d = d[d["PRD_DE"] == period].copy()
+
+    filters = pivot_cfg.get("filters", {})
+    for col, vals in filters.items():
+        if col in d.columns:
+            allowed = vals if isinstance(vals, list) else [vals]
+            d = d[d[col].astype(str).isin([str(v) for v in allowed])].copy()
+
+    d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+    d[row_col] = d[row_col].astype(str)
+    d[metric_col] = d[metric_col].astype(str)
+
+    row_order = [str(x) for x in pivot_cfg.get("row_order", [])]
+    if not row_order:
+        row_order = list(dict.fromkeys(d[row_col].astype(str)))
+    metric_order = [str(x) for x in pivot_cfg.get("metric_order", [])]
+    if not metric_order:
+        metric_order = list(dict.fromkeys(d[metric_col].astype(str)))
+
+    pv = d.pivot_table(
+        index=row_col,
+        columns=metric_col,
+        values="DT",
+        aggfunc="first",
+        sort=False,
+        observed=True,
+    )
+
+    row_alias_map = {str(k): str(v) for k, v in pivot_cfg.get("row_alias_map", {}).items()}
+    metric_label_map = {str(k): str(v) for k, v in pivot_cfg.get("metric_label_map", {}).items()}
+    value_round_map = {str(k): int(v) for k, v in pivot_cfg.get("value_round_map", {}).items()}
+    row_label = str(pivot_cfg.get("row_label", "구분"))
+
+    rows: List[Dict[str, Any]] = []
+    for row_key in row_order:
+        if row_key not in pv.index:
+            continue
+        rec = pv.loc[row_key]
+        row: Dict[str, Any] = {row_label: row_alias_map.get(row_key, row_key)}
+        for metric_key in metric_order:
+            label = metric_label_map.get(metric_key, metric_key)
+            digits = value_round_map.get(metric_key)
+            row[label] = _format_rounded_value(rec.get(metric_key), digits)
+        rows.append(row)
+
+    columns = [row_label] + [metric_label_map.get(metric_key, metric_key) for metric_key in metric_order]
+    return pd.DataFrame(rows, columns=columns)
+
+
+def make_dual_label_timeseries_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
+    required = ["PRD_DE", "DT"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"dual_label_timeseries_summary columns missing: {missing}")
+
+    row_key_col = str(pivot_cfg.get("row_key_col", "")).strip()
+    if not row_key_col or row_key_col not in df.columns:
+        raise RuntimeError("dual_label_timeseries_summary requires valid row_key_col")
+
+    years = [str(y) for y in pivot_cfg.get("years", [])]
+    if not years:
+        raise RuntimeError("dual_label_timeseries_summary requires non-empty years")
+
+    d = df.copy()
+    d["PRD_DE"] = d["PRD_DE"].astype(str)
+    d = d[d["PRD_DE"].isin(years)].copy()
+
+    filters = pivot_cfg.get("filters", {})
+    for col, vals in filters.items():
+        if col in d.columns:
+            allowed = vals if isinstance(vals, list) else [vals]
+            d = d[d[col].astype(str).isin([str(v) for v in allowed])].copy()
+
+    d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+    d[row_key_col] = d[row_key_col].astype(str)
+
+    pv = d.pivot_table(
+        index=row_key_col,
+        columns="PRD_DE",
+        values="DT",
+        aggfunc="first",
+        sort=False,
+        observed=True,
+    )
+    for year in years:
+        if year not in pv.columns:
+            pv[year] = pd.NA
+    pv = pv[years]
+
+    entries = pivot_cfg.get("entries", [])
+    if not isinstance(entries, list) or not entries:
+        raise RuntimeError("dual_label_timeseries_summary requires non-empty entries")
+
+    group_label = str(pivot_cfg.get("group_label", "구분"))
+    detail_label = str(pivot_cfg.get("detail_label", "세부업종"))
+    share_year = str(pivot_cfg.get("share_year", years[-1]))
+    share_base_key = str(pivot_cfg.get("share_base_key", "")).strip()
+    include_share = bool(pivot_cfg.get("include_share", True))
+    include_cagr = bool(pivot_cfg.get("include_cagr", True))
+    value_round = pivot_cfg.get("value_round")
+    value_round = int(value_round) if value_round is not None else None
+    cagr_label = str(pivot_cfg.get("cagr_label", "CAGR"))
+    periods = max(int(years[-1]) - int(years[0]), 1)
+
+    base_val = pd.to_numeric(pv.loc[share_base_key, share_year], errors="coerce") if share_base_key and share_base_key in pv.index else pd.NA
+
+    rows: List[Dict[str, Any]] = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        key = str(entry.get("key", "")).strip()
+        if not key or key not in pv.index:
+            continue
+        rec = pv.loc[key]
+        row: Dict[str, Any] = {
+            group_label: entry.get("group", ""),
+            detail_label: entry.get("detail", ""),
+        }
+        for year in years:
+            row[f"{year}년"] = _format_rounded_value(rec.get(year), value_round)
+
+        latest_val = pd.to_numeric(rec.get(share_year), errors="coerce")
+        start_val = pd.to_numeric(rec.get(years[0]), errors="coerce")
+        end_val = pd.to_numeric(rec.get(years[-1]), errors="coerce")
+        if include_share:
+            row["비중"] = (
+                round((latest_val / base_val) * 100, 1)
+                if pd.notna(latest_val) and pd.notna(base_val) and base_val not in (0, 0.0)
+                else pd.NA
+            )
+        if include_cagr:
+            row[cagr_label] = (
+                round((((end_val / start_val) ** (1 / periods)) - 1) * 100, 1)
+                if pd.notna(start_val) and pd.notna(end_val) and start_val > 0 and end_val > 0
+                else pd.NA
+            )
+        rows.append(row)
+
+    columns = [group_label, detail_label] + [f"{y}년" for y in years]
+    if include_share:
+        columns.append("비중")
+    if include_cagr:
+        columns.append(cagr_label)
+    return pd.DataFrame(rows, columns=columns)
+
+
+def make_region_year_metric_matrix_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
+    required = ["PRD_DE", "DT"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"region_year_metric_matrix columns missing: {missing}")
+
+    region_col = str(pivot_cfg.get("region_col", "")).strip()
+    metric_col = str(pivot_cfg.get("metric_col", "")).strip()
+    if not region_col or region_col not in df.columns:
+        raise RuntimeError("region_year_metric_matrix requires valid region_col")
+    if not metric_col or metric_col not in df.columns:
+        raise RuntimeError("region_year_metric_matrix requires valid metric_col")
+
+    years = [str(y) for y in pivot_cfg.get("years", [])]
+    metric_order = [str(x) for x in pivot_cfg.get("metric_order", [])]
+    if not years or not metric_order:
+        raise RuntimeError("region_year_metric_matrix requires years and metric_order")
+
+    d = df.copy()
+    d["PRD_DE"] = d["PRD_DE"].astype(str)
+    d = d[d["PRD_DE"].isin(years)].copy()
+
+    filters = pivot_cfg.get("filters", {})
+    for col, vals in filters.items():
+        if col in d.columns:
+            allowed = vals if isinstance(vals, list) else [vals]
+            d = d[d[col].astype(str).isin([str(v) for v in allowed])].copy()
+
+    d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+    d[region_col] = d[region_col].astype(str)
+    d[metric_col] = d[metric_col].astype(str)
+
+    region_order = [str(x) for x in pivot_cfg.get("region_order", [])]
+    if not region_order:
+        region_order = list(dict.fromkeys(d[region_col].astype(str)))
+
+    pv = d.pivot_table(
+        index=region_col,
+        columns=["PRD_DE", metric_col],
+        values="DT",
+        aggfunc="first",
+        sort=False,
+        observed=True,
+    )
+
+    for year in years:
+        for metric in metric_order:
+            if (year, metric) not in pv.columns:
+                pv[(year, metric)] = pd.NA
+    pv = pv.reindex(columns=pd.MultiIndex.from_tuples([(year, metric) for year in years for metric in metric_order]))
+
+    rows = []
+    for region in region_order:
+        if region not in pv.index:
+            continue
+        rows.append((region, pv.loc[region]))
+
+    subtotals = pivot_cfg.get("subtotals", [])
+    for subtotal in subtotals:
+        if not isinstance(subtotal, dict):
+            continue
+        members = [str(x) for x in subtotal.get("members", []) if str(x) in pv.index]
+        if not members:
+            continue
+        agg = str(subtotal.get("agg", "mean")).strip().lower()
+        block = pv.loc[members]
+        if agg in {"sum"}:
+            series = block.sum(axis=0, min_count=1)
+        else:
+            series = block.mean(axis=0)
+        rows.append((str(subtotal.get("label", "소계")), series))
+
+    row_label = str(pivot_cfg.get("row_label", "구분"))
+    out = pd.DataFrame([series for _, series in rows], index=[name for name, _ in rows])
+    out.index.name = row_label
+
+    year_label_map = {str(k): str(v) for k, v in pivot_cfg.get("year_label_map", {}).items()}
+    metric_label_map = {str(k): str(v) for k, v in pivot_cfg.get("metric_label_map", {}).items()}
+    out.columns = pd.MultiIndex.from_tuples(
+        [
+            (year_label_map.get(str(year), str(year)), metric_label_map.get(str(metric), str(metric)))
+            for year, metric in out.columns
+        ]
+    )
+
+    value_round_map = {str(k): int(v) for k, v in pivot_cfg.get("value_round_map", {}).items()}
+    for metric in metric_order:
+        digits = value_round_map.get(metric)
+        if digits is None:
+            continue
+        col_label = metric_label_map.get(metric, metric)
+        for year in years:
+            year_label = year_label_map.get(year, year)
+            if (year_label, col_label) in out.columns:
+                out[(year_label, col_label)] = out[(year_label, col_label)].map(lambda v: _format_rounded_value(v, digits))
+
+    return out.reset_index()
+
+
+def make_dual_label_latest_compare_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
+    required = ["PRD_DE", "DT"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"dual_label_latest_compare columns missing: {missing}")
+
+    row_key_col = str(pivot_cfg.get("row_key_col", "")).strip()
+    metric_col = str(pivot_cfg.get("metric_col", "")).strip()
+    if not row_key_col or row_key_col not in df.columns:
+        raise RuntimeError("dual_label_latest_compare requires valid row_key_col")
+    if not metric_col or metric_col not in df.columns:
+        raise RuntimeError("dual_label_latest_compare requires valid metric_col")
+
+    period = str(pivot_cfg.get("period", "")).strip()
+    if not period:
+        raise RuntimeError("dual_label_latest_compare requires period")
+
+    d = df.copy()
+    d["PRD_DE"] = d["PRD_DE"].astype(str)
+    d = d[d["PRD_DE"] == period].copy()
+
+    filters = pivot_cfg.get("filters", {})
+    for col, vals in filters.items():
+        if col in d.columns:
+            allowed = vals if isinstance(vals, list) else [vals]
+            d = d[d[col].astype(str).isin([str(v) for v in allowed])].copy()
+
+    d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+    d[row_key_col] = d[row_key_col].astype(str)
+    d[metric_col] = d[metric_col].astype(str)
+
+    entries = pivot_cfg.get("entries", [])
+    if not isinstance(entries, list) or not entries:
+        raise RuntimeError("dual_label_latest_compare requires non-empty entries")
+
+    metric_order = [str(x) for x in pivot_cfg.get("metric_order", [])]
+    if not metric_order:
+        metric_order = list(dict.fromkeys(d[metric_col].astype(str)))
+
+    pv = d.pivot_table(
+        index=row_key_col,
+        columns=metric_col,
+        values="DT",
+        aggfunc="first",
+        sort=False,
+        observed=True,
+    )
+
+    group_label = str(pivot_cfg.get("group_label", "구분"))
+    detail_label = str(pivot_cfg.get("detail_label", "세부"))
+    metric_label_map = {str(k): str(v) for k, v in pivot_cfg.get("metric_label_map", {}).items()}
+    value_round_map = {str(k): int(v) for k, v in pivot_cfg.get("value_round_map", {}).items()}
+    share_spec = pivot_cfg.get("share")
+    share_label = ""
+    share_num_metric = ""
+    share_den_metric = ""
+    share_round = 1
+    share_percent = True
+    if isinstance(share_spec, dict):
+        share_label = str(share_spec.get("label", "")).strip()
+        share_num_metric = str(share_spec.get("numerator_metric", "")).strip()
+        share_den_metric = str(share_spec.get("denominator_metric", "")).strip()
+        share_round = int(share_spec.get("round", 1))
+        share_percent = bool(share_spec.get("as_percent", True))
+
+    rows: List[Dict[str, Any]] = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        key = str(entry.get("key", "")).strip()
+        if not key or key not in pv.index:
+            continue
+        rec = pv.loc[key]
+        row: Dict[str, Any] = {
+            group_label: entry.get("group", ""),
+            detail_label: entry.get("detail", ""),
+        }
+        for metric_key in metric_order:
+            label = metric_label_map.get(metric_key, metric_key)
+            digits = value_round_map.get(metric_key)
+            row[label] = _format_rounded_value(rec.get(metric_key), digits)
+
+        if share_label and share_num_metric and share_den_metric:
+            num = pd.to_numeric(rec.get(share_num_metric), errors="coerce")
+            den = pd.to_numeric(rec.get(share_den_metric), errors="coerce")
+            if pd.notna(num) and pd.notna(den) and den not in (0, 0.0):
+                share_val = (num / den) * (100 if share_percent else 1)
+                row[share_label] = _format_rounded_value(share_val, share_round)
+            else:
+                row[share_label] = pd.NA
+
+        rows.append(row)
+
+    columns = [group_label, detail_label] + [metric_label_map.get(metric_key, metric_key) for metric_key in metric_order]
+    if share_label:
+        columns.append(share_label)
     return pd.DataFrame(rows, columns=columns)
 
