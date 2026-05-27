@@ -15,7 +15,6 @@ def init_state(default_region: str) -> None:
     st.session_state.setdefault("selected_paths", [])
     st.session_state.setdefault("selected_region", default_region)
     st.session_state.setdefault("selected_regions", [default_region])
-    st.session_state.setdefault("selected_period", "2026년 상반기")
     st.session_state.setdefault("last_failed_paths", [])
     st.session_state.setdefault("matrix_state", {})
     st.session_state.setdefault("last_terminal_at", None)

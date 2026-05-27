@@ -1,4 +1,3 @@
-import os
 import sys
 from functools import partial
 from pathlib import Path
@@ -7,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from runner_core.api_key_store import has_kosis_api_key
 from runner_core.exporters.excel_writer import save_excel
 from runner_core.jobs.executor import run_job
 from runner_core.providers.data_go import run_data_go_kr_job
@@ -23,8 +23,8 @@ SAMPLE_JOBS = [
 
 
 def main() -> int:
-    if not os.getenv("KOSIS_API_KEY", "").strip():
-        print("[ERROR] KOSIS_API_KEY 환경변수가 없습니다.")
+    if not has_kosis_api_key():
+        print("[ERROR] KOSIS API key was not found in .env or .env.local.")
         return 1
 
     provider_runners = {

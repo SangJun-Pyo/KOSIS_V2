@@ -1,13 +1,11 @@
-import os
 from typing import Any, Dict, Tuple
 
 import pandas as pd
 
 from runner_core.api.kosis_client import fetch_kosis_df
+from runner_core.api_key_store import get_kosis_api_key
 from runner_core.preprocess.filters import apply_row_filters
 from runner_core.views.builders import build_source_views
-
-KOSIS_API_KEY = os.getenv("KOSIS_API_KEY", "").strip()
 
 
 def run_kosis_sources_job(job: dict) -> Tuple[Any, Any, str]:
@@ -16,13 +14,14 @@ def run_kosis_sources_job(job: dict) -> Tuple[Any, Any, str]:
         raise RuntimeError("kosis_sources requires non-empty sources list")
 
     src_raw_frames: Dict[str, pd.DataFrame] = {}
+    api_key = get_kosis_api_key()
     for src in sources:
         if not isinstance(src, dict):
             raise RuntimeError("Each source must be a dict")
         src_name = str(src.get("name", "")).strip()
         if not src_name:
             raise RuntimeError("Each source needs a non-empty name")
-        src_raw_frames[src_name] = fetch_kosis_df(src, KOSIS_API_KEY)
+        src_raw_frames[src_name] = fetch_kosis_df(src, api_key)
 
     pivot_views = build_source_views(src_raw_frames, job)
     sheet_name = next(iter(pivot_views), "TABLE_VIEW")

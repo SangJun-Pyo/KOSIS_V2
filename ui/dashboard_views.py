@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -8,6 +7,7 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
+from runner_core.api_key_store import has_kosis_api_key
 from services.job_catalog_service import find_meta_for_artifact
 
 
@@ -29,7 +29,7 @@ def show_chip(status: str) -> None:
 
 
 def build_checklist(artifacts: list[Path], service_status: str) -> pd.DataFrame:
-    api_key_exists = bool(os.getenv("KOSIS_API_KEY", "").strip())
+    api_key_exists = has_kosis_api_key()
     rows = [
         ["선택 항목 존재 여부", "OK" if st.session_state["selected_paths"] else "NG", "정상" if st.session_state["selected_paths"] else "확인 필요"],
         ["지역 선택 여부", f"{len(st.session_state['selected_regions'])}개", "정상" if st.session_state["selected_regions"] else "확인 필요"],
@@ -111,7 +111,7 @@ def render_region_map(selected_region: str, on_select) -> None:
                     st.write("")
                     continue
                 is_selected = selected_region == region
-                if st.button(region, key=f"region_map_{row_index}_{region}", use_container_width=True, type="primary" if is_selected else "secondary"):
+                if st.button(region, key=f"region_map_{row_index}_{region}", width="stretch", type="primary" if is_selected else "secondary"):
                     on_select(region)
                     st.rerun()
 
@@ -164,7 +164,7 @@ def render_job_selector(groups: list[str], selected_group: str, filtered_job_row
             for row in visible_rows[:30]
         ]
         table_df = pd.DataFrame(table_rows) if table_rows else pd.DataFrame(columns=["항목명", "원천 데이터", "지역 범위", "최근 상태"])
-        st.dataframe(table_df, use_container_width=True, hide_index=True)
+        st.dataframe(table_df, width="stretch", hide_index=True)
 
 
 @st.fragment(run_every="2s")
@@ -182,16 +182,7 @@ def render_live_top(service, meta_by_path: dict[str, dict[str, Any]], valid_path
             st.title("한국지역고용연구소")
             st.markdown("<p class='muted'>지역 고용·통계 데이터를 정리하고 지표 산출 결과를 검토합니다.</p>", unsafe_allow_html=True)
         with right:
-            c1, c2, c3, c4, c5, c6 = st.columns([1.05, 0.85, 1.0, 1.25, 1.15, 1.0], gap="small")
-            with c1:
-                st.caption("기준 기간")
-                st.session_state["selected_period"] = st.selectbox(
-                    "기준 기간",
-                    ["2026년 상반기", "2026년 하반기"],
-                    index=0 if st.session_state["selected_period"] == "2026년 상반기" else 1,
-                    label_visibility="collapsed",
-                    key="selected_period_widget",
-                )
+            c2, c3, c4, c5, c6 = st.columns([0.85, 1.0, 1.25, 1.15, 1.0], gap="small")
             with c2:
                 st.caption("시스템 상태")
                 show_chip(service.state.status)
@@ -199,19 +190,19 @@ def render_live_top(service, meta_by_path: dict[str, dict[str, Any]], valid_path
                 st.caption("최근 실행")
                 st.write(last_run_time)
             with c4:
-                if st.button("선택 항목 처리 시작", type="primary", use_container_width=True, disabled=running, key="start_run_button"):
+                if st.button("선택 항목 처리 시작", type="primary", width="stretch", disabled=running, key="start_run_button"):
                     on_start()
             with c5:
-                if st.button("실패 작업 다시 실행", use_container_width=True, disabled=running, key="rerun_failed_button"):
+                if st.button("실패 작업 다시 실행", width="stretch", disabled=running, key="rerun_failed_button"):
                     on_rerun_failed()
             with c6:
-                if st.button("실행 중지", use_container_width=True, disabled=not running, key="stop_run_button"):
+                if st.button("실행 중지", width="stretch", disabled=not running, key="stop_run_button"):
                     on_stop()
 
     if running:
         refresh_col1, refresh_col2 = st.columns([1.0, 4.0], gap="small")
         with refresh_col1:
-            if st.button("진행 상태 새로고침", use_container_width=True, key="manual_refresh_button"):
+            if st.button("진행 상태 새로고침", width="stretch", key="manual_refresh_button"):
                 st.rerun()
         with refresh_col2:
             st.caption("실행 중에는 상태 영역만 자동 갱신됩니다.")
@@ -253,7 +244,7 @@ def render_live_right_panel(service, meta_by_path: dict[str, dict[str, Any]], co
             st.markdown(
                 f"""
 <div class="kv-grid">
-  <div class="kv-key">작업명</div><div class="kv-value">{first_meta.get('name', first_path)} / {st.session_state['selected_period']}</div>
+  <div class="kv-key">작업명</div><div class="kv-value">{first_meta.get('name', first_path)}</div>
   <div class="kv-key">원천 통계원</div><div class="kv-value">{first_meta.get('source', 'KOSIS')}</div>
   <div class="kv-key">실행 파일</div><div class="kv-value"><code>{first_path}</code></div>
   <div class="kv-key">대상 지역</div><div class="kv-value">{first_meta.get('scope_label', '-')}</div>
@@ -273,11 +264,11 @@ def render_live_right_panel(service, meta_by_path: dict[str, dict[str, Any]], co
         )
         st.divider()
         st.subheader("4. 검증 체크리스트")
-        st.dataframe(build_checklist(artifacts, service.state.status), use_container_width=True, hide_index=True)
+        st.dataframe(build_checklist(artifacts, service.state.status), width="stretch", hide_index=True)
 
 
 @st.fragment(run_every="2s")
-def render_live_bottom(service, meta_by_path: dict[str, dict[str, Any]], collect_runtime) -> None:
+def render_live_bottom(service, meta_by_path: dict[str, dict[str, Any]], collect_runtime, on_open_output_dir=None) -> None:
     runtime = collect_runtime(service, meta_by_path)
     artifacts = runtime["artifacts"]
 
@@ -288,7 +279,7 @@ def render_live_bottom(service, meta_by_path: dict[str, dict[str, Any]], collect
             matrix_df = build_matrix_table(st.session_state["selected_paths"], st.session_state["selected_regions"], meta_by_path)
             if matrix_df.empty:
                 matrix_df = pd.DataFrame(columns=["항목명", "적용 범위", "인천"])
-            st.dataframe(matrix_df, use_container_width=True, hide_index=True)
+            st.dataframe(matrix_df, width="stretch", hide_index=True)
 
     with bottom_right:
         with st.container(border=True):
@@ -296,10 +287,15 @@ def render_live_bottom(service, meta_by_path: dict[str, dict[str, Any]], collect
             result_df = build_result_table(artifacts, meta_by_path)
             if result_df.empty:
                 result_df = pd.DataFrame(columns=["파일명", "지역 범위", "생성 시간", "크기"])
-            st.dataframe(result_df, use_container_width=True, hide_index=True)
+            st.dataframe(result_df, width="stretch", hide_index=True)
+            if on_open_output_dir:
+                st.button("결과 폴더 열기", width="stretch", key="open_output_dir_button", on_click=on_open_output_dir)
             if artifacts:
-                with open(artifacts[0], "rb") as file_obj:
-                    st.download_button("최신 파일 다운로드", file_obj.read(), file_name=artifacts[0].name, use_container_width=True, key="download_latest_button")
+                try:
+                    with open(artifacts[0], "rb") as file_obj:
+                        st.download_button("최신 파일 다운로드", file_obj.read(), file_name=artifacts[0].name, width="stretch", key="download_latest_button")
+                except OSError:
+                    st.caption("최신 결과 파일을 지금 읽을 수 없습니다. 파일이 열려 있으면 닫은 뒤 다시 시도해 주세요.")
 
     with st.container(border=True):
         st.subheader("7. 실행 로그")
@@ -310,4 +306,4 @@ def render_live_bottom(service, meta_by_path: dict[str, dict[str, Any]], collect
         log_df = build_log_table(logs)
         if log_df.empty:
             log_df = pd.DataFrame([{"수준": "-", "메시지": "(로그 없음)"}])
-        st.dataframe(log_df, use_container_width=True, hide_index=True, height=260)
+        st.dataframe(log_df, width="stretch", hide_index=True, height=260)

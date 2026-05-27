@@ -148,6 +148,33 @@ def make_rank_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFram
         row[rank_label] = pd.NA if str(rec[region_col]) == national_name else _coerce_rank_value(rank_map.get(str(rec[region_col])))
         rows.append(row)
 
+    subtotals = pivot_cfg.get("subtotals", [])
+    if not subtotals and pivot_cfg.get("subtotal"):
+        subtotals = [pivot_cfg["subtotal"]]
+    for subtotal in subtotals:
+        members = [str(x) for x in subtotal.get("members", []) if str(x) in pv.index]
+        if not members:
+            continue
+        agg = str(subtotal.get("agg", "sum")).strip().lower()
+        subtotal_frame = pv.loc[members, years].apply(pd.to_numeric, errors="coerce")
+        if agg in {"mean", "avg", "average"}:
+            subtotal_vals = subtotal_frame.mean(axis=0)
+        else:
+            subtotal_vals = subtotal_frame.sum(axis=0, min_count=1)
+
+        row = {area_label: str(subtotal.get("label", "소계"))}
+        for y in years:
+            row[f"{y}년"] = subtotal_vals.get(y)
+
+        start_val = pd.to_numeric(subtotal_vals.get(years[0]), errors="coerce")
+        end_val = pd.to_numeric(subtotal_vals.get(years[-1]), errors="coerce")
+        if pd.notna(start_val) and pd.notna(end_val) and start_val > 0 and end_val > 0:
+            row[cagr_label] = round((((end_val / start_val) ** (1 / periods)) - 1) * 100, 1)
+        else:
+            row[cagr_label] = pd.NA
+        row[rank_label] = pd.NA
+        rows.append(row)
+
     cols = [area_label] + [f"{y}년" for y in years] + [rank_label, cagr_label]
     return pd.DataFrame(rows, columns=cols)
 

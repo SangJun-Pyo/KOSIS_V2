@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import threading
@@ -146,7 +147,26 @@ class JobRunnerService:
     def list_artifacts(self) -> list[Path]:
         if not OUTPUT_DIR.exists():
             return []
-        return sorted(OUTPUT_DIR.rglob("*.xlsx"), key=lambda path: path.stat().st_mtime, reverse=True)
+        artifacts: list[Path] = []
+        for path in OUTPUT_DIR.rglob("*.xlsx"):
+            if path.name.startswith("~$"):
+                continue
+            try:
+                path.stat()
+            except OSError:
+                continue
+            artifacts.append(path)
+        return sorted(artifacts, key=lambda path: path.stat().st_mtime, reverse=True)
+
+    def open_output_dir(self) -> dict[str, str]:
+        target_dir = OUTPUT_DIR.resolve()
+        if not target_dir.exists():
+            return {"ok": "false", "message": "결과 폴더가 아직 없습니다."}
+        try:
+            os.startfile(str(target_dir))  # type: ignore[attr-defined]
+        except Exception as exc:
+            return {"ok": "false", "message": f"결과 폴더를 열지 못했습니다: {exc}"}
+        return {"ok": "true", "message": "결과 폴더를 열었습니다."}
 
     def get_status_summary(self) -> dict[str, int]:
         total = len(self.state.selected_targets)

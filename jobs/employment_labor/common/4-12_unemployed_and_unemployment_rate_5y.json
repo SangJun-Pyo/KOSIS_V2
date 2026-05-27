@@ -1,0 +1,193 @@
+{
+  "job_name": "4-12_실업자수_실업률_광역비교_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "unemployed_count",
+      "orgId": "101",
+      "tblId": "INH_1DA7088S",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T40",
+      "objL1": "ALL"
+    },
+    {
+      "name": "unemployment_rate",
+      "orgId": "101",
+      "tblId": "INH_1DA7104S",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T80",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/common",
+  "output_prefix": "4-12_실업자수_실업률_광역비교_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "실업자 수 (천명)",
+          "source": "unemployed_count",
+          "kind": "single_metric_share_summary",
+          "region_col": "C1_NM",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T40"
+            ]
+          },
+          "replace_values": {
+            "C1_NM": {
+              "계": "전국",
+              "강원특별자치도": "강원특별자치도",
+              "전북특별자치도": "전북특별자치도",
+              "제주도": "제주특별자치도"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "전국",
+          "national_alias": "전국",
+          "share_year": "2025",
+          "include_share": false,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "전국",
+            "서울특별시",
+            "부산광역시",
+            "대구광역시",
+            "인천광역시",
+            "광주광역시",
+            "대전광역시",
+            "울산광역시",
+            "세종특별자치시",
+            "경기도",
+            "강원특별자치도",
+            "충청북도",
+            "충청남도",
+            "전북특별자치도",
+            "전라남도",
+            "경상북도",
+            "경상남도",
+            "제주특별자치도"
+          ],
+          "subtotal": {
+            "label": "8개 광역시 평균",
+            "members": [
+              "서울특별시",
+              "부산광역시",
+              "대구광역시",
+              "인천광역시",
+              "광주광역시",
+              "대전광역시",
+              "울산광역시",
+              "세종특별자치시"
+            ],
+            "agg": "mean"
+          },
+          "blank_rows": 2
+        },
+        {
+          "title": "실업률 (%)",
+          "source": "unemployment_rate",
+          "kind": "single_metric_share_summary",
+          "region_col": "C1_NM",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T80"
+            ],
+            "C2": [
+              "0"
+            ]
+          },
+          "replace_values": {
+            "C1_NM": {
+              "계": "전국",
+              "강원특별자치도": "강원특별자치도",
+              "전북특별자치도": "전북특별자치도",
+              "제주도": "제주특별자치도"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "전국",
+          "national_alias": "전국",
+          "share_year": "2025",
+          "include_share": false,
+          "value_round": 1,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "전국",
+            "서울특별시",
+            "부산광역시",
+            "대구광역시",
+            "인천광역시",
+            "광주광역시",
+            "대전광역시",
+            "울산광역시",
+            "세종특별자치시",
+            "경기도",
+            "강원특별자치도",
+            "충청북도",
+            "충청남도",
+            "전북특별자치도",
+            "전라남도",
+            "경상북도",
+            "경상남도",
+            "제주특별자치도"
+          ],
+          "subtotal": {
+            "label": "8개 광역시 평균",
+            "members": [
+              "서울특별시",
+              "부산광역시",
+              "대구광역시",
+              "인천광역시",
+              "광주광역시",
+              "대전광역시",
+              "울산광역시",
+              "세종특별자치시"
+            ],
+            "agg": "mean"
+          },
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [],
+  "serial_no": "4-12",
+  "source_sheet": "4-12",
+  "source_url": [
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T40+&objL1=ALL&format=json&jsonVD=Y&prdSe=Y&newEstPrdCnt=5&orgId=101&tblId=INH_1DA7088S",
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T80+&objL1=ALL&objL2=ALL&format=json&jsonVD=Y&prdSe=Y&newEstPrdCnt=5&orgId=101&tblId=INH_1DA7104S"
+  ],
+  "maintenance_review_20260527": [
+    "4-12 시트 기준으로 실업자 수와 실업률의 광역비교를 한 파일에 구성",
+    "실업자 수는 INH_1DA7088S의 T40, 실업률은 INH_1DA7104S의 T80과 C2=0(계)을 사용",
+    "8개 광역시 평균은 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종의 평균으로 계산"
+  ]
+}

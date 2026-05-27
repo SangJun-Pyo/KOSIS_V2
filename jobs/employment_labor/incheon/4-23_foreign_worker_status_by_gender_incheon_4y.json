@@ -1,0 +1,128 @@
+{
+  "job_name": "4-23_성별_외국인근로자현황_인천_최근4년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "foreign_worker_status",
+      "orgId": "110",
+      "tblId": "TX_11025_A001_A",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "16110AAA0",
+      "objL1": "11101HJG00 11101HJG11 11101HJG21 11101HJG22 11101HJG23 11101HJG24 11101HJG25 11101HJG26 11101HJG27 11101HJG31 11101HJG32 11101HJG33 11101HJG34 11101HJG35 11101HJG36 11101HJG37 11101HJG38 11101HJG39",
+      "objL2": "ALL",
+      "objL3": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-23_성별_외국인근로자현황_인천_최근4년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "성별 외국인근로자 현황",
+          "source": "foreign_worker_status",
+          "kind": "single_metric_share_summary",
+          "region_col": "C2_NM",
+          "years": ["2021", "2022", "2023", "2024"],
+          "filters": {
+            "ITM_ID": ["16110AAA0"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["15110AA0AA"],
+            "C3": ["C001"]
+          },
+          "replace_values": {
+            "C2_NM": {
+              "총인구": "총인구"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "총인구",
+          "national_alias": "총인구",
+          "share_year": "2024",
+          "include_share": false,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'24)",
+          "region_order": ["총인구"],
+          "blank_rows": 0
+        },
+        {
+          "title": "외국인 주민 합계",
+          "source": "foreign_worker_status",
+          "kind": "single_metric_share_summary",
+          "region_col": "C3_NM",
+          "years": ["2021", "2022", "2023", "2024"],
+          "filters": {
+            "ITM_ID": ["16110AAA0"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["15110AA000"],
+            "C3": ["C001", "C002", "C003"]
+          },
+          "replace_values": {
+            "C3_NM": {
+              "계": "계",
+              "남자": "남성",
+              "여자": "여성"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "계",
+          "share_year": "2024",
+          "include_share": false,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'24)",
+          "region_order": ["계", "남성", "여성"],
+          "blank_rows": 0
+        },
+        {
+          "title": "외국인 근로자 합계",
+          "source": "foreign_worker_status",
+          "kind": "single_metric_share_summary",
+          "region_col": "C3_NM",
+          "years": ["2021", "2022", "2023", "2024"],
+          "filters": {
+            "ITM_ID": ["16110AAA0"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["15110AA0ADAA"],
+            "C3": ["C001", "C002", "C003"]
+          },
+          "replace_values": {
+            "C3_NM": {
+              "계": "계",
+              "남자": "남성",
+              "여자": "여성"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "계",
+          "share_year": "2024",
+          "include_share": false,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'24)",
+          "region_order": ["계", "남성", "여성"],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": ["인천광역시"],
+  "serial_no": "4-23",
+  "source_sheet": "4-23",
+  "source_url": [
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=16110AAA0+&objL1=11101HJG00+11101HJG11+11101HJG21+11101HJG22+11101HJG23+11101HJG24+11101HJG25+11101HJG26+11101HJG27+11101HJG31+11101HJG32+11101HJG33+11101HJG34+11101HJG35+11101HJG36+11101HJG37+11101HJG38+11101HJG39+&objL2=ALL&objL3=ALL&format=json&jsonVD=Y&prdSe=Y&newEstPrdCnt=5&orgId=110&tblId=TX_11025_A001_A"
+  ],
+  "maintenance_review_20260527": [
+    "4-23 시트 기준으로 인천광역시의 성별 외국인근로자 현황을 최근 4년 기준으로 구성",
+    "총인구, 외국인 주민 합계, 외국인 근로자 합계를 각각 성별로 분리하여 표시",
+    "원천은 시군구별 외국인주민 현황(TX_11025_A001_A)이며 2021~2024년만 사용"
+  ]
+}

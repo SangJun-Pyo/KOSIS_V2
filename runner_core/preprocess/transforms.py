@@ -1,4 +1,5 @@
 import re
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Any, Dict, Optional
 
 import pandas as pd
@@ -134,6 +135,111 @@ def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
             sort_cols = [c for c in ["C1_NM", src, "PRD_DE", "ITM_NM"] if c in d.columns]
             if sort_cols:
                 d = d.sort_values(sort_cols, kind="stable")
+
+    quarter_avg_cfg = cfg.get("quarter_to_year_average")
+    if quarter_avg_cfg:
+        if not isinstance(quarter_avg_cfg, dict):
+            raise RuntimeError("preprocess.quarter_to_year_average must be a dict")
+        src = str(quarter_avg_cfg.get("source", "PRD_DE"))
+        if src not in d.columns:
+            raise RuntimeError(f"preprocess source column missing: {src}")
+        if "DT" not in d.columns:
+            raise RuntimeError("quarter_to_year_average requires DT column")
+
+        keep_years = [str(x) for x in quarter_avg_cfg.get("keep_years", []) if str(x).strip()]
+        d[src] = d[src].astype(str)
+        d = d[d[src].str.match(r"^\d{6}$", na=False)].copy()
+        d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+        d["__YEAR__"] = d[src].str[:4]
+        if keep_years:
+            d = d[d["__YEAR__"].isin(keep_years)].copy()
+
+        key_cols = quarter_avg_cfg.get("group_cols")
+        if isinstance(key_cols, list) and key_cols:
+            group_cols = [str(c) for c in key_cols if str(c) in d.columns]
+        else:
+            preferred = ["ORG_ID", "TBL_ID", "ITM_ID", "ITM_NM", "C1", "C1_NM", "C2", "C2_NM", "UNIT_NM", "TBL_NM"]
+            group_cols = [c for c in preferred if c in d.columns]
+        d = d.groupby(group_cols + ["__YEAR__"], as_index=False, dropna=False, sort=False, observed=True)["DT"].mean()
+        d = d.rename(columns={"__YEAR__": src})
+
+    scale_dt_cfg = cfg.get("scale_dt")
+    if scale_dt_cfg:
+        if "DT" not in d.columns:
+            raise RuntimeError("scale_dt requires DT column")
+        if isinstance(scale_dt_cfg, dict):
+            factor = float(scale_dt_cfg.get("factor", 1.0))
+        else:
+            factor = float(scale_dt_cfg)
+        d["DT"] = pd.to_numeric(d["DT"], errors="coerce") * factor
+
+    compose_cfg = cfg.get("compose_column")
+    if compose_cfg:
+        if not isinstance(compose_cfg, dict):
+            raise RuntimeError("preprocess.compose_column must be a dict")
+        target = str(compose_cfg.get("target", "")).strip()
+        template = str(compose_cfg.get("template", "")).strip()
+        if not target or not template:
+            raise RuntimeError("compose_column requires target and template")
+
+        def build_value(rec: pd.Series) -> str:
+            out = template
+            for key in re.findall(r"\{([^{}]+)\}", template):
+                out = out.replace("{" + key + "}", str(rec.get(key, "")))
+            return out
+
+        d[target] = d.apply(build_value, axis=1)
+
+    category_map_agg_cfg = cfg.get("category_map_aggregate")
+    if not category_map_agg_cfg and cfg.get("category_map_sum"):
+        category_map_agg_cfg = dict(cfg["category_map_sum"])
+        category_map_agg_cfg.setdefault("agg", "sum")
+    if category_map_agg_cfg:
+        if not isinstance(category_map_agg_cfg, dict):
+            raise RuntimeError("preprocess.category_map_aggregate must be a dict")
+        src = str(category_map_agg_cfg.get("source", "")).strip()
+        if not src or src not in d.columns:
+            raise RuntimeError(f"preprocess source column missing: {src}")
+        mapping = category_map_agg_cfg.get("mapping", {})
+        if not isinstance(mapping, dict) or not mapping:
+            raise RuntimeError("category_map_aggregate requires non-empty mapping")
+        target = str(category_map_agg_cfg.get("target", src)).strip() or src
+        keep_unmapped = bool(category_map_agg_cfg.get("keep_unmapped", False))
+        if "DT" not in d.columns:
+            raise RuntimeError("category_map_aggregate requires DT column")
+        agg = str(category_map_agg_cfg.get("agg", "sum")).strip().lower()
+
+        d[target] = d[src].astype(str).map({str(k): str(v) for k, v in mapping.items()})
+        if keep_unmapped:
+            d[target] = d[target].fillna(d[src].astype(str))
+        else:
+            d = d[d[target].notna()].copy()
+
+        key_cols = category_map_agg_cfg.get("group_cols")
+        if isinstance(key_cols, list) and key_cols:
+            group_cols = [str(c) for c in key_cols if str(c) in d.columns and str(c) not in {"DT", src}]
+        else:
+            group_cols = [c for c in d.columns if c not in {"DT", src, "LST_CHN_DE"}]
+            if target != src:
+                group_cols = [c for c in group_cols if c != target] + [target]
+
+        d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+        round_before_aggregate = category_map_agg_cfg.get("round_before_aggregate")
+        if round_before_aggregate is not None:
+            digits = int(round_before_aggregate)
+            quant = Decimal("1") if digits == 0 else Decimal("1").scaleb(-digits)
+
+            def _round_half_up(val: Any) -> Any:
+                if pd.isna(val):
+                    return val
+                return float(Decimal(str(float(val))).quantize(quant, rounding=ROUND_HALF_UP))
+
+            d["DT"] = d["DT"].map(_round_half_up)
+        grouped = d.groupby(group_cols, as_index=False, dropna=False, sort=False, observed=True)["DT"]
+        if agg in {"mean", "avg", "average"}:
+            d = grouped.mean()
+        else:
+            d = grouped.sum()
 
     return d
 

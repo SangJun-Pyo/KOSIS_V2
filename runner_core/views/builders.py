@@ -16,6 +16,7 @@ from runner_core.pivots.ranking import (
 from runner_core.pivots.ratio import make_ratio_timeseries_pivot
 from runner_core.pivots.summary import (
     make_age_distribution_summary_pivot,
+    make_group_metric_share_summary_pivot,
     make_metric_block_summary_pivot,
     make_metric_summary_pivot,
     make_paired_metric_latest_compare_pivot,
@@ -26,11 +27,23 @@ from runner_core.preprocess.filters import apply_row_filters, apply_value_maps
 from runner_core.preprocess.transforms import apply_preprocess, flatten_for_block, substitute_template
 
 def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
+    kind = str(spec.get("kind", "pivot")).strip().lower()
+
+    if kind == "single_metric_share_summary":
+        d = apply_row_filters(df, spec.get("filters", {}))
+        if isinstance(spec.get("preprocess"), dict):
+            d = apply_preprocess(d, {"preprocess": spec["preprocess"]})
+        d = apply_value_maps(d, spec)
+        share_base_df = None
+        if isinstance(spec.get("share_base_filters"), dict) and spec["share_base_filters"]:
+            share_base_df = df.copy()
+            share_base_df = apply_value_maps(share_base_df, spec)
+        return make_single_metric_share_summary_pivot(d, spec, share_base_df=share_base_df)
+
     d = apply_row_filters(df, spec.get("filters", {}))
     if isinstance(spec.get("preprocess"), dict):
         d = apply_preprocess(d, {"preprocess": spec["preprocess"]})
     d = apply_value_maps(d, spec)
-    kind = str(spec.get("kind", "pivot")).strip().lower()
 
     if kind == "pivot":
         return make_custom_pivot(d, spec)
@@ -52,6 +65,8 @@ def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
         return make_ratio_timeseries_pivot(d, spec)
     if kind == "metric_summary":
         return make_metric_summary_pivot(d, spec)
+    if kind == "group_metric_share_summary":
+        return make_group_metric_share_summary_pivot(d, spec)
     if kind == "metric_block_summary":
         return make_metric_block_summary_pivot(d, spec)
     if kind == "year_gender_mix":
@@ -70,8 +85,6 @@ def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
         return make_rank_and_metric_block_summary_pivot(d, spec)
     if kind == "age_distribution_summary":
         return make_age_distribution_summary_pivot(d, spec)
-    if kind == "single_metric_share_summary":
-        return make_single_metric_share_summary_pivot(d, spec)
     raise RuntimeError(f"unknown view kind: {kind}")
 
 def make_stack_blocks_view(source_frames: Dict[str, pd.DataFrame], spec: dict) -> pd.DataFrame:

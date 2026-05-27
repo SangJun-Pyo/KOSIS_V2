@@ -1,7 +1,14 @@
 @echo off
 cd /d %~dp0
+chcp 65001 >nul
 set "PYTHONUTF8=1"
+set "PYTHONIOENCODING=utf-8"
 
+if exist ".env" (
+  for /f "usebackq tokens=1,* delims==" %%A in (".env") do (
+    if /i not "%%A"=="REM" if not "%%A"=="" set "%%A=%%B"
+  )
+)
 if exist ".env.local" (
   for /f "usebackq tokens=1,* delims==" %%A in (".env.local") do (
     if /i not "%%A"=="REM" if not "%%A"=="" set "%%A=%%B"
@@ -20,15 +27,11 @@ if not errorlevel 1 (
 )
 
 if "%PY_CMD%"=="" (
-  echo [ERROR] Python is not installed or not available on PATH.
-  echo [INFO] Python 3.13 or later install is recommended.
+  echo [ERROR] Python was not found.
+  echo [INFO] Python 3.13 or later is recommended.
   pause
   exit /b 1
 )
-
-set "LOCAL_DEPS=%CD%\.deps"
-if not exist "%LOCAL_DEPS%" mkdir "%LOCAL_DEPS%"
-set "PYTHONPATH=%LOCAL_DEPS%;%PYTHONPATH%"
 
 echo [INFO] Checking pip...
 call %PY_CMD% -m pip --version >nul 2>&1
@@ -38,28 +41,50 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo [INFO] Installing or updating dependencies into .deps...
-call %PY_CMD% -m pip install --disable-pip-version-check --target "%LOCAL_DEPS%" --upgrade -r requirements.txt
-if errorlevel 1 (
-  echo [ERROR] Failed to install dependencies.
-  pause
-  exit /b 1
-)
-
 call %PY_CMD% -c "import requests,pandas,openpyxl,streamlit" >nul 2>&1
 if errorlevel 1 (
-  echo [ERROR] Dependency verification failed after installation.
-  pause
-  exit /b 1
+  echo [INFO] Installing or updating required packages...
+  call %PY_CMD% -m pip install --disable-pip-version-check --upgrade -r requirements.txt
+  if errorlevel 1 (
+    echo [ERROR] Failed to install dependencies.
+    pause
+    exit /b 1
+  )
+
+  call %PY_CMD% -c "import requests,pandas,openpyxl,streamlit" >nul 2>&1
+  if errorlevel 1 (
+    echo [ERROR] Dependency verification failed after installation.
+    pause
+    exit /b 1
+  )
 )
 
 if "%KOSIS_API_KEY%"=="" (
   echo [WARN] KOSIS_API_KEY is not set.
-  echo [WARN] The app will open, but real KOSIS collection runs may fail.
-  echo [INFO] You can create a .env.local file with:
+  echo [WARN] The app can open, but real KOSIS runs may fail.
+  echo [INFO] Add this line to .env:
   echo [INFO] KOSIS_API_KEY=YOUR_REAL_API_KEY
 )
 
-echo [INFO] Launching 한국지역고용연구소...
-call %PY_CMD% -m streamlit run app.py --global.developmentMode false
-pause
+echo [INFO] Starting KOSIS Dashboard...
+set "STREAMLIT_LAUNCHER=%TEMP%\kosis_streamlit_launcher.bat"
+(
+  echo @echo off
+  echo title KOSIS Dashboard Console - close with Ctrl+C
+  echo cd /d "%CD%"
+  echo chcp 65001 ^>nul
+  echo set "PYTHONUTF8=1"
+  echo set "PYTHONIOENCODING=utf-8"
+  echo echo [INFO] KOSIS Dashboard is running.
+  echo echo [INFO] Press Ctrl+C in this window to close the dashboard.
+  echo echo [INFO] If a confirmation prompt appears, press Y.
+  echo call %PY_CMD% -m streamlit run app.py --global.developmentMode false --server.headless true
+  echo exit /b %%errorlevel%%
+) > "%STREAMLIT_LAUNCHER%"
+
+start "KOSIS Dashboard Console" /min "%STREAMLIT_LAUNCHER%"
+start "" "http://localhost:8501"
+echo [INFO] Dashboard console started minimized.
+echo [INFO] Your browser should open automatically.
+echo [INFO] To stop the dashboard, press Ctrl+C in the dashboard console window.
+exit /b 0

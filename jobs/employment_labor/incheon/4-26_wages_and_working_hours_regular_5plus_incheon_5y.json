@@ -1,0 +1,93 @@
+{
+  "job_name": "4-26_임금근로시간_상용5인이상_인천_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "wages_hours_5plus",
+      "orgId": "118",
+      "tblId": "DT_118N_MON061",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "sdmx",
+      "jsonVD": "Y",
+      "type": "StructureSpecific",
+      "version": "v2_1",
+      "itmId": "index1 index2 index3 index4 index5 index6 index7 index8",
+      "objL1": "ALL",
+      "objL2": "IND201700",
+      "objL3": "2024size_2"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-26_임금근로시간_상용5인이상_인천_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "시도/산업/규모별 임금 및 근로시간(상용근로자, 상용근로자 5인이상 사업체)",
+          "source": "wages_hours_5plus",
+          "kind": "single_metric_share_summary",
+          "region_col": "ITM_NM",
+          "years": ["2021", "2022", "2023", "2024", "2025"],
+          "filters": {
+            "C1": ["zone17_4"],
+            "C2": ["IND201700"],
+            "C3": ["2024size_2"],
+            "ITM_ID": ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "index8"]
+          },
+          "replace_values": {
+            "ITM_NM": {
+              "index1": "상용근로일수 (일)",
+              "index2": "상용총근로시간 (시간)",
+              "index3": "상용소정실근로시간 (시간)",
+              "index4": "상용초과근로시간 (시간)",
+              "index5": "상용월급여액 (원)",
+              "index6": "상용정액급여 (원)",
+              "index7": "상용초과급여 (원)",
+              "index8": "상용특별급여 (원)"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "상용근로일수 (일)",
+          "national_alias": "상용근로일수 (일)",
+          "share_year": "2025",
+          "include_share": false,
+          "value_round": 1,
+          "value_round_map": {
+            "상용월급여액 (원)": 0,
+            "상용정액급여 (원)": 0,
+            "상용초과급여 (원)": 0,
+            "상용특별급여 (원)": 0
+          },
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "상용근로일수 (일)",
+            "상용총근로시간 (시간)",
+            "상용소정실근로시간 (시간)",
+            "상용초과근로시간 (시간)",
+            "상용월급여액 (원)",
+            "상용정액급여 (원)",
+            "상용초과급여 (원)",
+            "상용특별급여 (원)"
+          ],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": ["인천"],
+  "serial_no": "4-26",
+  "source_sheet": "4-26",
+  "source_url": [
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=index1+index2+index3+index4+index5+index6+index7+index8+&objL1=ALL&objL2=IND201700+&objL3=2024size_2+&format=sdmx&jsonVD=Y&type=StructureSpecific&prdSe=Y&newEstPrdCnt=5&orgId=118&tblId=DT_118N_MON061&version=v2_1"
+  ],
+  "maintenance_review_20260527": [
+    "4-26 시트 기준으로 인천의 전산업 전규모(상용 5인 이상) 임금 및 근로시간을 최근 5년 기준으로 구성",
+    "SDMX 원천 DT_118N_MON061의 zone17_4(인천), IND201700(전산업), 2024size_2(5인이상 추정)를 사용"
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "job_name": "4-27_시도별_노사분규건수_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "labor_dispute_cases",
+      "orgId": "118",
+      "tblId": "DT_11826_N004",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "01",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/common",
+  "output_prefix": "4-27_시도별_노사분규건수_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "시도별 노사분규건수",
+          "source": "labor_dispute_cases",
+          "kind": "single_metric_share_summary",
+          "region_col": "C1_NM",
+          "years": ["2021", "2022", "2023", "2024", "2025"],
+          "filters": {
+            "ITM_ID": ["01"],
+            "C2": ["100"]
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "계",
+          "share_year": "2025",
+          "include_share": true,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "계",
+            "서울특별시",
+            "부산광역시",
+            "대구광역시",
+            "인천광역시",
+            "광주광역시",
+            "대전광역시",
+            "울산광역시",
+            "세종특별자치시",
+            "경기도",
+            "강원특별자치도",
+            "충청북도",
+            "충청남도",
+            "전북특별자치도",
+            "전라남도",
+            "경상북도",
+            "경상남도",
+            "제주특별자치도"
+          ],
+          "subtotal": {
+            "label": "8개 광역시 평균",
+            "members": [
+              "서울특별시",
+              "부산광역시",
+              "대구광역시",
+              "인천광역시",
+              "광주광역시",
+              "대전광역시",
+              "울산광역시",
+              "세종특별자치시"
+            ],
+            "agg": "mean",
+            "value_round": 3
+          },
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [],
+  "serial_no": "4-27",
+  "source_sheet": "4-27",
+  "source_url": [
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=01+&objL1=ALL&objL2=ALL&format=json&jsonVD=Y&prdSe=Y&newEstPrdCnt=5&orgId=118&tblId=DT_11826_N004"
+  ],
+  "maintenance_review_20260527": [
+    "4-27 시트 기준으로 시도별 노사분규건수를 최근 5년 기준으로 구성",
+    "연간 계(C2=100)만 사용하고 8개 광역시 평균을 추가 계산"
+  ]
+}

@@ -24,3 +24,22 @@ def request_json_with_retry(url: str, params: dict, timeout: int = DEFAULT_TIMEO
             time.sleep(RETRY_WAIT_SEC)
 
     raise RuntimeError(f"API ?? ?? after {MAX_RETRIES} attempts: {last_error}")
+
+
+def request_text_with_retry(url: str, params: dict, timeout: int = DEFAULT_TIMEOUT) -> str:
+    last_error: Optional[Exception] = None
+
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            r = requests.get(url, params=params, timeout=timeout)
+            r.raise_for_status()
+            return r.text
+        except Exception as e:
+            last_error = e
+            if attempt >= MAX_RETRIES:
+                break
+            print(colorize(f"[WARN] ?? ?? {attempt}/{MAX_RETRIES}: {e}", ANSI_YELLOW))
+            print(f"[INFO] {RETRY_WAIT_SEC:.0f}? ? ??????.")
+            time.sleep(RETRY_WAIT_SEC)
+
+    raise RuntimeError(f"API ?? ?? after {MAX_RETRIES} attempts: {last_error}")

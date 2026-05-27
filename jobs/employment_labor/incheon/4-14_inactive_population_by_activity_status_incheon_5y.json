@@ -1,0 +1,94 @@
+{
+  "job_name": "4-14_활동상태별_비경제활동인구_인천_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "inactive_population_activity",
+      "orgId": "101",
+      "tblId": "DT_1ES3B26J",
+      "prdSe": "H",
+      "newEstPrdCnt": 10,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T00 T10 T12 T13 T15 T14 T20 T21",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-14_활동상태별_비경제활동인구_인천_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "활동상태별 비경제활동인구",
+          "source": "inactive_population_activity",
+          "kind": "single_metric_share_summary",
+          "region_col": "ITM_NM",
+          "years": ["2021", "2022", "2023", "2024", "2025"],
+          "filters": {
+            "ITM_ID": ["T00", "T10", "T12", "T13", "T15", "T14"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["S0"]
+          },
+          "replace_values": {
+            "ITM_NM": {
+              "비경제활동인구 (천명)": "비경제활동인구 (천명)",
+              "활동상태(육아가사)": "육아,가사",
+              "활동상태(재학진학준비)": "재학,진학준비",
+              "활동상태(취업준비)": "취업준비",
+              "활동상태(연로)": "연로",
+              "활동상태(기타)": "기타"
+            },
+            "PRD_DE": {
+              "202102": "2021",
+              "202202": "2022",
+              "202302": "2023",
+              "202402": "2024",
+              "202502": "2025"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "비경제활동인구 (천명)",
+          "national_alias": "비경제활동인구 (천명)",
+          "share_year": "2025",
+          "share_base_year": "2025",
+          "include_share": true,
+          "share_base_filters": {
+            "ITM_ID": ["T00"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["S0"]
+          },
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "비경제활동인구 (천명)",
+            "육아,가사",
+            "재학,진학준비",
+            "취업준비",
+            "연로",
+            "기타"
+          ],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": ["인천광역시"],
+  "serial_no": "4-14",
+  "source_sheet": "4-14",
+  "source_url": [
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T00+T10+T12+T13+T15+T14+T20+T21+&objL1=ALL&objL2=ALL&format=json&jsonVD=Y&prdSe=H&newEstPrdCnt=10&orgId=101&tblId=DT_1ES3B26J"
+  ],
+  "maintenance_review_20260527": [
+    "4-14 시트 기준으로 인천광역시의 활동상태별 비경제활동인구를 최근 5년 하반기 기준으로 구성",
+    "활동상태 표는 비경제활동인구 총계(T00)와 육아가사(T10), 재학진학준비(T12), 취업준비(T13), 연로(T15), 기타(T14)를 사용",
+    "각 연도는 하반기(2/2)인 202102, 202202, 202302, 202402, 202502만 사용",
+    "비중은 2025년 비경제활동인구 총계 대비 비중으로 계산"
+  ]
+}

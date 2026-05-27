@@ -1,12 +1,10 @@
-import os
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
 from runner_core.api.kosis_client import fetch_kosis_df
-from runner_core.views.builders import build_table_views
-
-KOSIS_API_KEY = os.getenv("KOSIS_API_KEY", "").strip()
+from runner_core.api_key_store import get_kosis_api_key
+from runner_core.views.builders import build_source_views, build_table_views
 
 
 def run_kosis_multi_job(job: dict) -> Tuple[Any, Any, str]:
@@ -29,7 +27,7 @@ def run_kosis_multi_job(job: dict) -> Tuple[Any, Any, str]:
         src_name = str(src.get("name", "")).strip()
         if not src_name:
             raise RuntimeError("Each source needs a non-empty name")
-        df = fetch_kosis_df(src, KOSIS_API_KEY)
+        df = fetch_kosis_df(src, get_kosis_api_key())
         need = [c for c in merge_keys if c not in df.columns]
         if need:
             raise RuntimeError(f"source '{src_name}' missing merge keys: {need}")
@@ -111,7 +109,14 @@ def run_kosis_multi_job(job: dict) -> Tuple[Any, Any, str]:
         raise RuntimeError("No metric columns available after merge/formula")
 
     raw_df = pd.concat(long_parts, ignore_index=True)
-    pivot_views = build_table_views(raw_df, job)
+    metric_view_df = raw_df.rename(columns={"VALUE": "DT"}).copy()
+    source_frames: Dict[str, pd.DataFrame] = dict(src_raw_frames)
+    source_frames["metrics"] = metric_view_df
+
+    if isinstance(job.get("views"), list) and job.get("views"):
+        pivot_views = build_source_views(source_frames, job)
+    else:
+        pivot_views = build_table_views(raw_df, job)
     sheet_name = next(iter(pivot_views), "TABLE_VIEW")
 
     raw_out: Any = raw_df

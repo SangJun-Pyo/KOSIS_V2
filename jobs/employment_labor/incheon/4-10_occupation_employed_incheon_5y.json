@@ -1,0 +1,94 @@
+{
+  "job_name": "4-10_직업별취업자수_인천_최근5년하반기",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "occupation_employed",
+      "orgId": "101",
+      "tblId": "DT_1ES3B06J",
+      "prdSe": "H",
+      "startPrdDe": "202102",
+      "endPrdDe": "202502",
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T1",
+      "objL1": "ALL",
+      "objL2": "0 1 2 3 4 5 6 7 8 9"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-10_직업별취업자수_인천_최근5년하반기",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "직업별 취업자 수(천명)",
+          "source": "occupation_employed",
+          "kind": "single_metric_share_summary",
+          "replace_values": {
+            "PRD_DE": {
+              "202102": "2021",
+              "202202": "2022",
+              "202302": "2023",
+              "202402": "2024",
+              "202502": "2025"
+            }
+          },
+          "region_col": "C2_NM",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T1"
+            ],
+            "C1_NM": [
+              "인천광역시"
+            ]
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "계",
+          "share_year": "2025",
+          "include_share": true,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "계",
+            "관리자",
+            "전문가 및 관련 종사자",
+            "사무 종사자",
+            "서비스 종사자",
+            "판매 종사자",
+            "농림어업 숙련 종사자",
+            "기능원 및 관련 기능 종사자",
+            "장치‧기계 조작 및 조립 종사자",
+            "단순 노무 종사자"
+          ],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "serial_no": "4-10",
+  "source_sheet": "4-10",
+  "source_url": "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T1+T001+&objL1=ALL&objL2=0+1+2+3+4+5+6+7+8+9+&format=json&jsonVD=Y&prdSe=H&newEstPrdCnt=10&orgId=101&tblId=DT_1ES3B06J",
+  "maintenance_review_20260527": [
+    "4-10 시트 기준으로 인천광역시 직업별 취업자 수를 작성",
+    "반기 데이터는 2021~2025년 하반기(2/2) 값만 사용",
+    "직업 분류는 계, 관리자, 전문가 및 관련 종사자, 사무 종사자, 서비스 종사자, 판매 종사자, 농림어업 숙련 종사자, 기능원 및 관련 기능 종사자, 장치‧기계 조작 및 조립 종사자, 단순 노무 종사자를 사용",
+    "비중은 2025년 계 대비 각 직업 분류 취업자 수 비중으로 계산"
+  ]
+}

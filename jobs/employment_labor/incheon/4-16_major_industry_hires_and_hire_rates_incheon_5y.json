@@ -1,0 +1,193 @@
+{
+  "job_name": "4-16_주요산업별_입직자_입직률_인천_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "hire_count",
+      "orgId": "118",
+      "tblId": "DT_118N_MOND56",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "emp001 emp002 emp003 emp004 emp005 emp006 emp007 emp008 emp009 emp010 emp011 emp012 emp013 emp014",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    },
+    {
+      "name": "hire_rate",
+      "orgId": "118",
+      "tblId": "DT_118N_MOND56",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "emp001 emp002 emp003 emp004 emp005 emp006 emp007 emp008 emp009 emp010 emp011 emp012 emp013 emp014",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-16_주요산업별_입직자_입직률_인천_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "입직자_(상용+임시일용) (명)",
+          "source": "hire_count",
+          "kind": "group_metric_share_summary",
+          "preprocess": {
+            "category_map_aggregate": {
+              "source": "C2_NM",
+              "target": "INDUSTRY_GROUP",
+              "agg": "sum",
+              "mapping": {
+                "전체": "계",
+                "B.광업(05~08)": "광·제조업(B,C)",
+                "C.제조업(10~34)": "광·제조업(B,C)",
+                "F.건설업(41~42)": "건설업(F)",
+                "G.도매 및 소매업(45~47)": "도소매·숙박음식업 (G,I)",
+                "I.숙박 및 음식점업(55~56)": "도소매·숙박음식업 (G,I)",
+                "D.전기 가스 증기 및 공기 조절 공급업(35)": "전기·운수·통신·금융(D,H,J,K)",
+                "H.운수 및 창고업(49~52)": "전기·운수·통신·금융(D,H,J,K)",
+                "J.정보통신업(58~63)": "전기·운수·통신·금융(D,H,J,K)",
+                "K.금융 및 보험업(64~66)": "전기·운수·통신·금융(D,H,J,K)",
+                "E.수도 하수 및 폐기물 처리 원료 재생업(36~39)": "사업·개인·공공서비스(E,L~S)",
+                "L.부동산업(68)": "사업·개인·공공서비스(E,L~S)",
+                "M.전문 과학 및 기술 서비스업(70~73)": "사업·개인·공공서비스(E,L~S)",
+                "N.사업시설 관리 사업 지원 및 임대 서비스업(74~76)": "사업·개인·공공서비스(E,L~S)",
+                "O.공공행정 국방 및 사회보장 행정(84)": "사업·개인·공공서비스(E,L~S)",
+                "P.교육 서비스업(85)": "사업·개인·공공서비스(E,L~S)",
+                "Q.보건업 및 사회복지 서비스업(86~87)": "사업·개인·공공서비스(E,L~S)",
+                "R.예술 스포츠 및 여가관련 서비스업(90~91)": "사업·개인·공공서비스(E,L~S)",
+                "S.협회 및 단체 수리 및 기타 개인 서비스업(94~96)": "사업·개인·공공서비스(E,L~S)"
+              },
+              "group_cols": [
+                "PRD_DE",
+                "ITM_ID",
+                "ITM_NM",
+                "C1_NM",
+                "INDUSTRY_GROUP"
+              ]
+            },
+            "scale_dt": {
+              "factor": 0.001
+            }
+          },
+          "filters": {
+            "ITM_ID": ["emp006"],
+            "C1_NM": ["전국", "인천광역시"]
+          },
+          "region_col": "C1_NM",
+          "category_col": "INDUSTRY_GROUP",
+          "years": ["2021", "2022", "2023", "2024", "2025"],
+          "area_label": "지역",
+          "category_label": "구분",
+          "share_year": "2025",
+          "share_base_category": "계",
+          "include_share": true,
+          "value_round": 3,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": ["전국", "인천광역시"],
+          "category_order": [
+            "계",
+            "광·제조업(B,C)",
+            "건설업(F)",
+            "도소매·숙박음식업 (G,I)",
+            "전기·운수·통신·금융(D,H,J,K)",
+            "사업·개인·공공서비스(E,L~S)"
+          ],
+          "region_alias_map": {
+            "전국": "전국",
+            "인천광역시": "인천시"
+          },
+          "blank_rows": 2
+        },
+        {
+          "title": "입직률_(상용+임시일용) (%)",
+          "source": "hire_rate",
+          "kind": "group_metric_share_summary",
+          "preprocess": {
+            "category_map_aggregate": {
+              "source": "C2_NM",
+              "target": "INDUSTRY_GROUP",
+              "agg": "mean",
+              "mapping": {
+                "전체": "계",
+                "B.광업(05~08)": "광·제조업(B,C)",
+                "C.제조업(10~34)": "광·제조업(B,C)",
+                "F.건설업(41~42)": "건설업(F)",
+                "G.도매 및 소매업(45~47)": "도소매·숙박음식업 (G,I)",
+                "I.숙박 및 음식점업(55~56)": "도소매·숙박음식업 (G,I)",
+                "D.전기 가스 증기 및 공기 조절 공급업(35)": "전기·운수·통신·금융(D,H,J,K)",
+                "H.운수 및 창고업(49~52)": "전기·운수·통신·금융(D,H,J,K)",
+                "J.정보통신업(58~63)": "전기·운수·통신·금융(D,H,J,K)",
+                "K.금융 및 보험업(64~66)": "전기·운수·통신·금융(D,H,J,K)",
+                "E.수도 하수 및 폐기물 처리 원료 재생업(36~39)": "사업·개인·공공서비스(E,L~S)",
+                "L.부동산업(68)": "사업·개인·공공서비스(E,L~S)",
+                "M.전문 과학 및 기술 서비스업(70~73)": "사업·개인·공공서비스(E,L~S)",
+                "N.사업시설 관리 사업 지원 및 임대 서비스업(74~76)": "사업·개인·공공서비스(E,L~S)",
+                "O.공공행정 국방 및 사회보장 행정(84)": "사업·개인·공공서비스(E,L~S)",
+                "P.교육 서비스업(85)": "사업·개인·공공서비스(E,L~S)",
+                "Q.보건업 및 사회복지 서비스업(86~87)": "사업·개인·공공서비스(E,L~S)",
+                "R.예술 스포츠 및 여가관련 서비스업(90~91)": "사업·개인·공공서비스(E,L~S)",
+                "S.협회 및 단체 수리 및 기타 개인 서비스업(94~96)": "사업·개인·공공서비스(E,L~S)"
+              },
+              "group_cols": [
+                "PRD_DE",
+                "ITM_ID",
+                "ITM_NM",
+                "C1_NM",
+                "INDUSTRY_GROUP"
+              ]
+            }
+          },
+          "filters": {
+            "ITM_ID": ["emp007"],
+            "C1_NM": ["전국", "인천광역시"]
+          },
+          "region_col": "C1_NM",
+          "category_col": "INDUSTRY_GROUP",
+          "years": ["2021", "2022", "2023", "2024", "2025"],
+          "area_label": "지역",
+          "category_label": "구분",
+          "share_year": "2025",
+          "include_share": false,
+          "value_round": 6,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": ["전국", "인천광역시"],
+          "category_order": [
+            "계",
+            "광·제조업(B,C)",
+            "건설업(F)",
+            "도소매·숙박음식업 (G,I)",
+            "전기·운수·통신·금융(D,H,J,K)",
+            "사업·개인·공공서비스(E,L~S)"
+          ],
+          "region_alias_map": {
+            "전국": "전국",
+            "인천광역시": "인천시"
+          },
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": ["전국", "인천광역시"],
+  "serial_no": "4-16",
+  "source_sheet": "4-16",
+  "source_url": [
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=emp001+emp002+emp003+emp004+emp005+emp006+emp007+emp008+emp009+emp010+emp011+emp012+emp013+emp014+&objL1=ALL&objL2=ALL&format=json&jsonVD=Y&prdSe=Y&newEstPrdCnt=5&orgId=118&tblId=DT_118N_MOND56"
+  ],
+  "maintenance_review_20260527": [
+    "4-16 시트 기준으로 전국과 인천시의 주요 산업별 입직자 수와 입직률을 최근 5년 기준으로 구성",
+    "입직자 수는 emp006을 사용하고, raw 명 단위를 천명 단위로 환산하여 표시",
+    "입직률은 emp007을 사용하고, 산업 묶음은 세부 산업의 단순평균으로 계산",
+    "비중은 각 지역의 2025년 계 대비 산업별 입직자 수 비중으로 계산"
+  ]
+}

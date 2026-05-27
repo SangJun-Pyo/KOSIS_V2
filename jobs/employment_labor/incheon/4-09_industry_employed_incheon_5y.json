@@ -1,0 +1,129 @@
+{
+  "job_name": "4-09_산업별취업자수_인천_최근5년하반기",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "industry_employed",
+      "orgId": "101",
+      "tblId": "DT_1ES3B05J",
+      "prdSe": "H",
+      "startPrdDe": "202102",
+      "endPrdDe": "202502",
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T1",
+      "objL1": "ALL",
+      "objL2": "0 A B C D E F G H I J K L M N O P Q R S T U"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-09_산업별취업자수_인천_최근5년하반기",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "산업별 취업자 수 (천명)",
+          "source": "industry_employed",
+          "kind": "single_metric_share_summary",
+          "preprocess": {
+            "category_map_aggregate": {
+              "source": "C2",
+              "target": "INDUSTRY_GROUP",
+              "agg": "sum",
+              "round_before_aggregate": 0,
+              "mapping": {
+                "0": "계",
+                "A": "농업, 임업, 어업(A)",
+                "B": "광·제조업(B,C)",
+                "C": "광·제조업(B,C)",
+                "F": "건설업(F)",
+                "G": "도소매·숙박음식업 (G,I)",
+                "I": "도소매·숙박음식업 (G,I)",
+                "D": "전기·운수·통신·금융(D,H,J,K)",
+                "H": "전기·운수·통신·금융(D,H,J,K)",
+                "J": "전기·운수·통신·금융(D,H,J,K)",
+                "K": "전기·운수·통신·금융(D,H,J,K)",
+                "E": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "L": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "M": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "N": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "O": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "P": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "Q": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "R": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "S": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "T": "사업·개인·공공서비스 및 기타(E,L~U)",
+                "U": "사업·개인·공공서비스 및 기타(E,L~U)"
+              },
+              "group_cols": [
+                "PRD_DE",
+                "ITM_ID",
+                "ITM_NM",
+                "INDUSTRY_GROUP"
+              ]
+            }
+          },
+          "replace_values": {
+            "PRD_DE": {
+              "202102": "2021",
+              "202202": "2022",
+              "202302": "2023",
+              "202402": "2024",
+              "202502": "2025"
+            }
+          },
+          "region_col": "INDUSTRY_GROUP",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T1"
+            ],
+            "C1_NM": [
+              "인천광역시"
+            ]
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "계",
+          "share_year": "2025",
+          "include_share": true,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "계",
+            "농업, 임업, 어업(A)",
+            "광·제조업(B,C)",
+            "건설업(F)",
+            "도소매·숙박음식업 (G,I)",
+            "전기·운수·통신·금융(D,H,J,K)",
+            "사업·개인·공공서비스 및 기타(E,L~U)"
+          ],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "serial_no": "4-09",
+  "source_sheet": "4-09",
+  "source_url": "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T1+T001+&objL1=ALL&objL2=0+A+B+C+D+E+F+G+H+I+J+K+L+M+N+O+P+Q+R+S+T+U+&format=json&jsonVD=Y&prdSe=H&newEstPrdCnt=10&orgId=101&tblId=DT_1ES3B05J",
+  "maintenance_review_20260527": [
+    "4-09 시트 기준으로 인천광역시 산업별 취업자 수를 6개 대분류로 재구성",
+    "반기 데이터는 2021~2025년 하반기(2/2) 값만 사용",
+    "광·제조업(B,C), 도소매·숙박음식업(G,I), 전기·운수·통신·금융(D,H,J,K), 사업·개인·공공서비스 및 기타(E,L~U)로 묶음",
+    "비중은 2025년 계 대비 각 산업 분류 취업자 수 비중으로 계산"
+  ]
+}

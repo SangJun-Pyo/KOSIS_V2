@@ -1,5 +1,8 @@
-﻿.deps/
+.deps/
+.deps_clean/
+.deps_shims/
 __pycache__/
 output/
+.env
 .env.local
 *.pyc

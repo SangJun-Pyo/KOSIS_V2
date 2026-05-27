@@ -1,0 +1,83 @@
+{
+  "job_name": "4-11_종사상지위별취업자수_인천_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "status_employed",
+      "orgId": "101",
+      "tblId": "DT_1DA7035S",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T30",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-11_종사상지위별취업자수_인천_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "종사상 지위별 취업자 수(최신화로 수정)",
+          "source": "status_employed",
+          "kind": "single_metric_share_summary",
+          "region_col": "C2_NM",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T30"
+            ],
+            "C1_NM": [
+              "인천광역시"
+            ]
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "계",
+          "share_year": "2025",
+          "include_share": true,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "계",
+            "비임금근로자",
+            "*자영업자",
+            "-고용원이 있는 자영업자",
+            "-고용원이 없는 자영업자",
+            "-무급가족종사자",
+            "임금근로자",
+            "-상용근로자",
+            "-임시근로자",
+            "-일용근로자"
+          ],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "serial_no": "4-11",
+  "source_sheet": "4-11",
+  "source_url": "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T30+&objL1=ALL&objL2=ALL&format=json&jsonVD=Y&prdSe=Y&newEstPrdCnt=5&orgId=101&tblId=DT_1DA7035S",
+  "maintenance_review_20260527": [
+    "4-11 시트 기준으로 인천광역시 종사상 지위별 취업자 수를 작성",
+    "분류는 계, 비임금근로자, 자영업자, 고용원이 있는 자영업자, 고용원이 없는 자영업자, 무급가족종사자, 임금근로자, 상용근로자, 임시근로자, 일용근로자를 사용",
+    "비중은 2025년 계 대비 각 분류 취업자 수 비중으로 계산"
+  ]
+}

@@ -1,11 +1,17 @@
 from __future__ import annotations
 
-import os
 import time
 from pathlib import Path
 
 import streamlit as st
 
+from runner_core.api_key_store import (
+    clear_kosis_api_key,
+    get_kosis_api_key,
+    get_legacy_env_kosis_api_key,
+    mask_api_key,
+    save_kosis_api_key,
+)
 from services.job_catalog_service import DEFAULT_SCOPE_REGION, REGIONS, build_job_index, filter_rows_by_region
 from services.job_runner_service import JobRunnerService
 from state.dashboard_state import apply_selected_region, build_matrix, collect_runtime, init_state
@@ -51,9 +57,63 @@ def stop_run(service: JobRunnerService) -> None:
     st.rerun()
 
 
+def open_output_dir(service: JobRunnerService) -> None:
+    result = service.open_output_dir()
+    if result["ok"] == "true":
+        st.toast(result["message"])
+    else:
+        st.session_state["flash"] = ("error", result["message"])
+
+
+def render_api_key_manager() -> None:
+    current_key = get_kosis_api_key()
+    legacy_key = get_legacy_env_kosis_api_key()
+
+    with st.expander("KOSIS API Key", expanded=not bool(current_key)):
+        if current_key:
+            st.success(f"Saved in .env: {mask_api_key(current_key)}")
+        else:
+            st.warning("No KOSIS API key is saved in .env yet.")
+
+        if legacy_key and legacy_key != current_key:
+            st.info("A legacy Windows environment-variable key was detected. You can import it into .env below.")
+
+        new_key = st.text_input(
+            "KOSIS API Key",
+            value="",
+            type="password",
+            placeholder="Enter a KOSIS API key to save in .env",
+            key="kosis_api_key_input",
+        )
+
+        save_col, import_col, clear_col = st.columns(3, gap="small")
+        with save_col:
+            if st.button("Save Key", width="stretch", key="save_kosis_api_key_button"):
+                if not new_key.strip():
+                    st.session_state["flash"] = ("error", "Enter a KOSIS API key before saving.")
+                else:
+                    save_kosis_api_key(new_key)
+                    st.session_state["_api_key_exists"] = True
+                    st.session_state["flash"] = ("success", "Saved the KOSIS API key to .env.")
+                    st.rerun()
+        with import_col:
+            import_disabled = not legacy_key or legacy_key == current_key
+            if st.button("Import Env Key", width="stretch", disabled=import_disabled, key="import_legacy_kosis_api_key_button"):
+                save_kosis_api_key(legacy_key)
+                st.session_state["_api_key_exists"] = True
+                st.session_state["flash"] = ("success", "Imported the existing environment-variable key into .env.")
+                st.rerun()
+        with clear_col:
+            if st.button("Clear .env Key", width="stretch", disabled=not current_key, key="clear_kosis_api_key_button"):
+                clear_kosis_api_key()
+                st.session_state["_api_key_exists"] = False
+                st.session_state["flash"] = ("success", "Removed the KOSIS API key from .env.")
+                st.rerun()
+
+
 inject_styles()
 init_state(DEFAULT_SCOPE_REGION)
-st.session_state["_api_key_exists"] = bool(os.getenv("KOSIS_API_KEY", "").strip())
+st.session_state["_api_key_exists"] = bool(get_kosis_api_key().strip())
 
 service = get_service()
 groups = service.list_job_groups()
@@ -74,6 +134,8 @@ valid_paths = [row["path"] for row in filtered_job_rows]
 st.session_state["selected_paths"] = [path for path in st.session_state["selected_paths"] if path in valid_paths]
 if not st.session_state["selected_paths"] and valid_paths:
     st.session_state["selected_paths"] = valid_paths[: min(4, len(valid_paths))]
+
+render_api_key_manager()
 
 render_live_top(
     service,
@@ -105,4 +167,4 @@ with center_col:
 with right_col:
     render_live_right_panel(service, meta_by_path, collect_runtime)
 
-render_live_bottom(service, meta_by_path, collect_runtime)
+render_live_bottom(service, meta_by_path, collect_runtime, lambda: open_output_dir(service))

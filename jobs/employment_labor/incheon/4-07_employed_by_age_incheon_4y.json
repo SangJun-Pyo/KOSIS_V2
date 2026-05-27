@@ -1,0 +1,115 @@
+{
+  "job_name": "4-07_취업자수_연령별_인천_최근4년하반기",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "incheon_age_employed",
+      "orgId": "101",
+      "tblId": "DT_1ES3A03_A01S",
+      "prdSe": "H",
+      "startPrdDe": "202202",
+      "endPrdDe": "202502",
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T00",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-07_취업자수_연령별_인천_최근4년하반기",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "취업자 수",
+          "source": "incheon_age_employed",
+          "kind": "single_metric_share_summary",
+          "preprocess": {
+            "category_map_aggregate": {
+              "source": "C2_NM",
+              "target": "AGE_GROUP",
+              "agg": "sum",
+              "mapping": {
+                "계": "계",
+                "15 - 29세": "청년(15~29세)",
+                "30 - 49세": "중년(30~49세)",
+                "50 - 64세": "장년(50~64세)",
+                "65세이상": "노년(65세 이상)"
+              },
+              "group_cols": [
+                "PRD_DE",
+                "ITM_ID",
+                "ITM_NM",
+                "AGE_GROUP"
+              ]
+            }
+          },
+          "replace_values": {
+            "PRD_DE": {
+              "202202": "2022",
+              "202302": "2023",
+              "202402": "2024",
+              "202502": "2025"
+            }
+          },
+          "region_col": "AGE_GROUP",
+          "years": [
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T00"
+            ],
+            "C1_NM": [
+              "인천 중구",
+              "인천 동구",
+              "인천 연수구",
+              "인천 남동구",
+              "인천 부평구",
+              "인천 계양구",
+              "인천 서구",
+              "인천 미추홀구",
+              "인천 강화군",
+              "인천 옹진군"
+            ]
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "계",
+          "share_year": "2025",
+          "include_share": true,
+          "value_round": 1,
+          "cagr_label": "CAGR('22~'25)",
+          "region_order": [
+            "계",
+            "청년(15~29세)",
+            "중년(30~49세)",
+            "장년(50~64세)",
+            "노년(65세 이상)"
+          ],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": [
+    "인천"
+  ],
+  "serial_no": "4-07",
+  "source_sheet": "4-07+08",
+  "source_url": "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T00+&objL1=ALL&objL2=ALL&format=json&jsonVD=Y&prdSe=H&startPrdDe=202202&endPrdDe=202502&orgId=101&tblId=DT_1ES3A03_A01S",
+  "maintenance_review_20260527": [
+    "4-07+08 시트 기준으로 인천 10개 시군구의 하반기(2/2) 취업자 수를 합산",
+    "4-07은 청년, 중년, 장년, 노년의 연령 분류를 모두 표시",
+    "비중은 각 연도 전체 취업자 수 대비 각 연령 취업자 수 비중으로 계산"
+  ]
+}

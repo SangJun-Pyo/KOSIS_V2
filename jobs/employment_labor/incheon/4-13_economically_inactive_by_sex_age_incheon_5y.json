@@ -1,0 +1,154 @@
+{
+  "job_name": "4-13_성별연령별_비경제활동인구_인천_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "inactive_population_halfyear",
+      "orgId": "101",
+      "tblId": "DT_1ES3B14J",
+      "prdSe": "H",
+      "newEstPrdCnt": 10,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T00 T10 T12 T13 T14 T15 T21 T22 T23",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-13_성별연령별_비경제활동인구_인천_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "source": "inactive_population_halfyear",
+          "kind": "single_metric_share_summary",
+          "region_col": "C2_NM",
+          "years": ["2021", "2022", "2023", "2024", "2025"],
+          "filters": {
+            "ITM_ID": ["T00"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["S0"]
+          },
+          "replace_values": {
+            "C2_NM": {
+              "계": "비경제활동인구 계"
+            },
+            "PRD_DE": {
+              "202102": "2021",
+              "202202": "2022",
+              "202302": "2023",
+              "202402": "2024",
+              "202502": "2025"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "비경제활동인구 계",
+          "national_alias": "비경제활동인구 계",
+          "share_year": "2025",
+          "include_share": true,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": ["비경제활동인구 계"],
+          "blank_rows": 0
+        },
+        {
+          "title": "성별",
+          "source": "inactive_population_halfyear",
+          "kind": "single_metric_share_summary",
+          "region_col": "C2_NM",
+          "years": ["2021", "2022", "2023", "2024", "2025"],
+          "filters": {
+            "ITM_ID": ["T00"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["S1", "S2"]
+          },
+          "replace_values": {
+            "C2_NM": {
+              "남자": "남성",
+              "여자": "여성"
+            },
+            "PRD_DE": {
+              "202102": "2021",
+              "202202": "2022",
+              "202302": "2023",
+              "202402": "2024",
+              "202502": "2025"
+            }
+          },
+          "area_label": "구분",
+          "share_year": "2025",
+          "share_base_year": "2025",
+          "include_share": true,
+          "share_base_filters": {
+            "ITM_ID": ["T00"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["S0"]
+          },
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": ["남성", "여성"],
+          "blank_rows": 0
+        },
+        {
+          "title": "연령별",
+          "source": "inactive_population_halfyear",
+          "kind": "single_metric_share_summary",
+          "region_col": "ITM_NM",
+          "years": ["2021", "2022", "2023", "2024", "2025"],
+          "filters": {
+            "ITM_ID": ["T10", "T12", "T13", "T14", "T15"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["S0"]
+          },
+          "replace_values": {
+            "ITM_NM": {
+              "- 연령별(15~29세)": "15~29세",
+              "- 연령별(30~39세)": "30~39세",
+              "- 연령별(40~49세)": "40~49세",
+              "- 연령별(50~59세)": "50~59세",
+              "- 연령별(60세이상)": "60세 이상"
+            },
+            "PRD_DE": {
+              "202102": "2021",
+              "202202": "2022",
+              "202302": "2023",
+              "202402": "2024",
+              "202502": "2025"
+            }
+          },
+          "area_label": "구분",
+          "share_year": "2025",
+          "share_base_year": "2025",
+          "include_share": true,
+          "share_base_filters": {
+            "ITM_ID": ["T00"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["S0"]
+          },
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": ["15~29세", "30~39세", "40~49세", "50~59세", "60세 이상"],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": ["인천광역시"],
+  "serial_no": "4-13",
+  "source_sheet": "4-13",
+  "source_url": [
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T00+T10+T12+T13+T14+T15+T21+T22+T23+&objL1=ALL&objL2=ALL&format=json&jsonVD=Y&prdSe=H&newEstPrdCnt=10&orgId=101&tblId=DT_1ES3B14J"
+  ],
+  "maintenance_review_20260527": [
+    "4-13 시트 기준으로 인천광역시의 성별/연령별 비경제활동인구를 최근 5년 하반기 기준으로 구성",
+    "총계는 T00, 성별은 T00의 남자/여자, 연령별은 T10/T12/T13/T14/T15의 계(S0)를 사용",
+    "각 연도는 하반기(2/2)인 202102, 202202, 202302, 202402, 202502만 사용",
+    "비중은 2025년 비경제활동인구 총계 대비 비중으로 계산"
+  ]
+}

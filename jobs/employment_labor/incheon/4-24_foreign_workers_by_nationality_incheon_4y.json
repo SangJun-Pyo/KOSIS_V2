@@ -1,0 +1,115 @@
+{
+  "job_name": "4-24_국적별_외국인근로자현황_인천_최근4년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "foreign_workers_by_nationality",
+      "orgId": "110",
+      "tblId": "TX_11025_A005_A",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "16110AAA1",
+      "objL1": "11101HJG00 11101HJG11 11101HJG21 11101HJG22 11101HJG23 11101HJG24 11101HJG25 11101HJG26 11101HJG27 11101HJG31 11101HJG32 11101HJG33 11101HJG34 11101HJG35 11101HJG36 11101HJG37 11101HJG38 11101HJG39",
+      "objL2": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/incheon",
+  "output_prefix": "4-24_국적별_외국인근로자현황_인천_최근4년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "국적별 외국인근로자 현황",
+          "source": "foreign_workers_by_nationality",
+          "kind": "single_metric_share_summary",
+          "region_col": "C2_NM",
+          "years": ["2021", "2022", "2023", "2024"],
+          "filters": {
+            "ITM_ID": ["16110AAA1"],
+            "C1_NM": ["인천광역시"],
+            "C2": [
+              "15110AA200",
+              "15110AA2AA",
+              "15110AA2AB",
+              "15110AA2AC",
+              "15110AA2AD",
+              "15110AA2AI",
+              "15110AA2AE",
+              "15110AA2AJ",
+              "15110AA2AK",
+              "15110AA2AL",
+              "15110AA2ALA",
+              "15110AA2AM",
+              "15110AA2AG"
+            ]
+          },
+          "replace_values": {
+            "C2_NM": {
+              "합계": "합계",
+              "동북아시아": "동북아시아",
+              "동남아시아": "동남아시아",
+              "서남아시아": "서남아시아",
+              "중앙아시아": "중앙아시아",
+              "아시아(기타)": "아시아(기타)",
+              "미국": "미국",
+              "캐나다": "캐나다",
+              "유럽": "유럽",
+              "오세아니아": "오세아니아",
+              "중남미": "중남미",
+              "아프리카": "아프리카",
+              "기타": "기타"
+            }
+          },
+          "area_label": "구분",
+          "national_name": "합계",
+          "national_alias": "합계",
+          "share_year": "2024",
+          "share_base_year": "2024",
+          "include_share": true,
+          "share_base_filters": {
+            "ITM_ID": ["16110AAA1"],
+            "C1_NM": ["인천광역시"],
+            "C2": ["15110AA200"]
+          },
+          "preserve_text_values": true,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'24)",
+          "region_order": [
+            "합계",
+            "동북아시아",
+            "동남아시아",
+            "서남아시아",
+            "중앙아시아",
+            "아시아(기타)",
+            "미국",
+            "캐나다",
+            "유럽",
+            "오세아니아",
+            "중남미",
+            "아프리카",
+            "기타"
+          ],
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": false,
+  "scope_type": "incheon",
+  "scope_regions": ["인천광역시"],
+  "serial_no": "4-24",
+  "source_sheet": "4-24",
+  "source_url": [
+    "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=16110AAA1+&objL1=11101HJG00+11101HJG11+11101HJG21+11101HJG22+11101HJG23+11101HJG24+11101HJG25+11101HJG26+11101HJG27+11101HJG31+11101HJG32+11101HJG33+11101HJG34+11101HJG35+11101HJG36+11101HJG37+11101HJG38+11101HJG39+&objL2=ALL&format=json&jsonVD=Y&prdSe=Y&newEstPrdCnt=5&orgId=110&tblId=TX_11025_A005_A"
+  ],
+  "maintenance_review_20260527": [
+    "4-24 시트 기준으로 인천광역시의 국적별 외국인근로자 현황을 최근 4년 기준으로 구성",
+    "합계와 주요 권역 및 국가(미국, 캐나다)를 사용",
+    "비중은 2024년 외국인근로자 합계 대비 비중으로 계산"
+  ]
+}

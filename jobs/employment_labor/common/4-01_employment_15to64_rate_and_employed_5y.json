@@ -1,0 +1,156 @@
+{
+  "job_name": "4-01_전체고용률_취업자수_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "employment_main",
+      "orgId": "101",
+      "tblId": "DT_1DA7004S",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T10 T20 T30 T40 T50 T60 T80 T90 T100",
+      "objL1": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/common",
+  "output_prefix": "4-01_전체고용률_취업자수_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "취업자 수",
+          "source": "employment_main",
+          "kind": "single_metric_share_summary",
+          "region_col": "C1_NM",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T30"
+            ]
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "전국",
+          "share_year": "2025",
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "계",
+            "서울특별시",
+            "부산광역시",
+            "대구광역시",
+            "인천광역시",
+            "광주광역시",
+            "대전광역시",
+            "울산광역시",
+            "세종특별자치시",
+            "경기도",
+            "강원도",
+            "충청북도",
+            "충청남도",
+            "전라북도",
+            "전라남도",
+            "경상북도",
+            "경상남도",
+            "제주도"
+          ],
+          "subtotal": {
+            "label": "8개 광역시 평균",
+            "members": [
+              "서울특별시",
+              "부산광역시",
+              "대구광역시",
+              "인천광역시",
+              "광주광역시",
+              "대전광역시",
+              "울산광역시",
+              "세종특별자치시"
+            ],
+            "agg": "mean"
+          },
+          "blank_rows": 2
+        },
+        {
+          "title": "15~64세 고용률",
+          "source": "employment_main",
+          "kind": "single_metric_share_summary",
+          "region_col": "C1_NM",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T100"
+            ]
+          },
+          "area_label": "구분",
+          "national_name": "계",
+          "national_alias": "전국",
+          "share_year": "2025",
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "계",
+            "서울특별시",
+            "부산광역시",
+            "대구광역시",
+            "인천광역시",
+            "광주광역시",
+            "대전광역시",
+            "울산광역시",
+            "세종특별자치시",
+            "경기도",
+            "강원도",
+            "충청북도",
+            "충청남도",
+            "전라북도",
+            "전라남도",
+            "경상북도",
+            "경상남도",
+            "제주도"
+          ],
+          "subtotal": {
+            "label": "8개 광역시 평균",
+            "members": [
+              "서울특별시",
+              "부산광역시",
+              "대구광역시",
+              "인천광역시",
+              "광주광역시",
+              "대전광역시",
+              "울산광역시",
+              "세종특별자치시"
+            ],
+            "agg": "mean"
+          },
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [],
+  "serial_no": "4-01",
+  "source_sheet": "4-01",
+  "source_url": "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T10+T20+T30+T40+T50+T60+T80+T90+T100+&objL1=ALL&format=json&jsonVD=Y&prdSe=Y&newEstPrdCnt=5&orgId=101&tblId=DT_1DA7004S",
+  "maintenance_review_20260525": [
+    "목차와 4-01 시트 기준으로 최초 작성",
+    "취업자 수와 15~64세 고용률을 동일 원천표에서 분리 가공",
+    "8개 광역시 평균은 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종의 평균으로 계산",
+    "사용자 제공 OpenAPI URL 기준으로 itmId와 objL1 파라미터 반영"
+  ]
+}

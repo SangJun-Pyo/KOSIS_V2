@@ -1,0 +1,134 @@
+{
+  "job_name": "4-06_지역별구직급여신청자수_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "job_seekers_allowance",
+      "orgId": "118",
+      "tblId": "DT_11844N_7374_F",
+      "prdSe": "Q",
+      "startPrdDe": "202101",
+      "endPrdDe": "202504",
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T1",
+      "objL1": "ALL"
+    }
+  ],
+  "output_subdir": "employment_labor/common",
+  "output_prefix": "4-06_지역별구직급여신청자수_최근5년",
+  "views": [
+    {
+      "kind": "stack_blocks",
+      "sheet_name": "TABLE_VIEW",
+      "blocks": [
+        {
+          "title": "지역별 구직급여 신청자수",
+          "source": "job_seekers_allowance",
+          "kind": "single_metric_share_summary",
+          "preprocess": {
+            "quarter_to_year_average": {
+              "source": "PRD_DE",
+              "keep_years": [
+                "2021",
+                "2022",
+                "2023",
+                "2024",
+                "2025"
+              ]
+            }
+          },
+          "region_col": "C1_NM",
+          "years": [
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "filters": {
+            "ITM_ID": [
+              "T1"
+            ],
+            "C1_NM": [
+              "전국",
+              "서울",
+              "부산",
+              "대구",
+              "인천",
+              "광주",
+              "대전",
+              "울산",
+              "세종",
+              "경기",
+              "강원",
+              "충북",
+              "충남",
+              "전북",
+              "전남",
+              "경북",
+              "경남",
+              "제주"
+            ]
+          },
+          "area_label": "구분",
+          "national_name": "전국",
+          "national_alias": "전국",
+          "share_year": "2025",
+          "include_share": false,
+          "value_round": 0,
+          "cagr_label": "CAGR('21~'25)",
+          "region_order": [
+            "전국",
+            "서울",
+            "부산",
+            "대구",
+            "인천",
+            "광주",
+            "대전",
+            "울산",
+            "세종",
+            "경기",
+            "강원",
+            "충북",
+            "충남",
+            "전북",
+            "전남",
+            "경북",
+            "경남",
+            "제주"
+          ],
+          "subtotal": {
+            "label": "8개 광역시 평균",
+            "members": [
+              "서울",
+              "부산",
+              "대구",
+              "인천",
+              "광주",
+              "대전",
+              "울산",
+              "세종"
+            ],
+            "agg": "mean"
+          },
+          "blank_rows": 0
+        }
+      ]
+    }
+  ],
+  "scope_all_regions": true,
+  "scope_type": "common",
+  "scope_regions": [],
+  "serial_no": "4-06",
+  "source_sheet": "4-06",
+  "source_url": "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&itmId=T1+&objL1=ALL&format=json&jsonVD=Y&prdSe=Q&startPrdDe=202101&endPrdDe=202504&orgId=118&tblId=DT_11844N_7374_F",
+  "maintenance_review_20260527": [
+    "4-06 시트 기준으로 지역별 구직급여 신청자수 광역비교를 작성",
+    "원천 분기 데이터는 각 연도 4개 분기 평균값으로 연도값을 구성",
+    "조회 기간은 2021.1/4부터 2025.4/4까지 고정하여 2021년 1분기 누락을 방지",
+    "분류불능 행은 제외하고 전국 및 17개 광역지자체만 사용",
+    "8개 광역시 평균은 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종의 평균으로 계산"
+  ]
+}
