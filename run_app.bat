@@ -26,7 +26,16 @@ if not errorlevel 1 (
   )
 )
 
+if not "%PY_CMD%"=="" (
+  call %PY_CMD% -c "import sys" >nul 2>&1
+  if errorlevel 1 (
+    echo [WARN] A Python launcher was found, but no usable Python 3.13 runtime is installed.
+    set "PY_CMD="
+  )
+)
+
 if "%PY_CMD%"=="" (
+:install_python
   echo [WARN] Python was not found.
   echo [INFO] Trying to install Python 3.13 with winget...
   where winget >nul 2>&1
@@ -58,12 +67,26 @@ if "%PY_CMD%"=="" (
     )
   )
 
+  if not "%PY_CMD%"=="" (
+    call %PY_CMD% -c "import sys" >nul 2>&1
+    if errorlevel 1 (
+      set "PY_CMD="
+    )
+  )
+
   if "%PY_CMD%"=="" (
     echo [ERROR] Python still was not found in this console.
     echo [INFO] Close this window and run run_app.bat again.
     pause
     exit /b 1
   )
+)
+
+call %PY_CMD% -c "import sys" >nul 2>&1
+if errorlevel 1 (
+  echo [WARN] The detected Python command is not usable.
+  set "PY_CMD="
+  goto :install_python
 )
 
 echo [INFO] Checking pip...
@@ -74,7 +97,14 @@ if errorlevel 1 (
   call %PY_CMD% -m ensurepip --upgrade
   if errorlevel 1 (
     echo [ERROR] Failed to bootstrap pip with ensurepip.
-    echo [INFO] Reinstall Python 3.13 or later with pip included, then run this file again.
+    echo [INFO] This usually means Python itself is incomplete or the launcher points to a missing runtime.
+    echo [INFO] Reinstalling Python 3.13 with winget is recommended.
+    where winget >nul 2>&1
+    if not errorlevel 1 (
+      echo [INFO] Run this command if needed:
+      echo [INFO] winget install --id Python.Python.3.13 --exact --accept-package-agreements --accept-source-agreements
+    )
+    echo [INFO] Manual download: https://www.python.org/downloads/windows/
     pause
     exit /b 1
   )
@@ -83,6 +113,7 @@ if errorlevel 1 (
   if errorlevel 1 (
     echo [ERROR] pip is still not available after ensurepip.
     echo [INFO] Reinstall Python 3.13 or later with pip included, then run this file again.
+    echo [INFO] Manual download: https://www.python.org/downloads/windows/
     pause
     exit /b 1
   )
