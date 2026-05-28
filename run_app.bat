@@ -69,9 +69,23 @@ if "%PY_CMD%"=="" (
 echo [INFO] Checking pip...
 call %PY_CMD% -m pip --version >nul 2>&1
 if errorlevel 1 (
-  echo [ERROR] pip is not available in this Python environment.
-  pause
-  exit /b 1
+  echo [WARN] pip is not available in this Python environment.
+  echo [INFO] Trying to bootstrap pip with ensurepip...
+  call %PY_CMD% -m ensurepip --upgrade
+  if errorlevel 1 (
+    echo [ERROR] Failed to bootstrap pip with ensurepip.
+    echo [INFO] Reinstall Python 3.13 or later with pip included, then run this file again.
+    pause
+    exit /b 1
+  )
+
+  call %PY_CMD% -m pip --version >nul 2>&1
+  if errorlevel 1 (
+    echo [ERROR] pip is still not available after ensurepip.
+    echo [INFO] Reinstall Python 3.13 or later with pip included, then run this file again.
+    pause
+    exit /b 1
+  )
 )
 
 call %PY_CMD% -c "import requests,pandas,openpyxl,streamlit" >nul 2>&1
