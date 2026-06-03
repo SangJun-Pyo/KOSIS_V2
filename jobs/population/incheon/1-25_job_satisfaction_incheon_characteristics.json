@@ -1,188 +1,149 @@
 {
   "job_name": "1-25_일에대한만족도_인천_특성별",
   "provider": "kosis_sources",
+  "include_source_raw": false,
   "sources": [
     {
-      "name": "job_satisfaction",
+      "name": "job_itself",
       "orgId": "204",
-      "tblId": "DT_204010_2025A058",
+      "tblId": "DT_204010_2025A069",
       "prdSe": "Y",
       "newEstPrdCnt": 1,
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T001",
       "objL1": "ALL",
-      "objL2": "ALL",
-      "objL3": "ALL"
+      "objL2": "ALL"
+    },
+    {
+      "name": "job_income",
+      "orgId": "204",
+      "tblId": "DT_204010_2025A070",
+      "prdSe": "Y",
+      "newEstPrdCnt": 1,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T001",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    },
+    {
+      "name": "job_hours",
+      "orgId": "204",
+      "tblId": "DT_204010_2025A071",
+      "prdSe": "Y",
+      "newEstPrdCnt": 1,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T001",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    },
+    {
+      "name": "job_environment",
+      "orgId": "204",
+      "tblId": "DT_204010_2025A072",
+      "prdSe": "Y",
+      "newEstPrdCnt": 1,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T001",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    },
+    {
+      "name": "job_overall",
+      "orgId": "204",
+      "tblId": "DT_204010_2025A073",
+      "prdSe": "Y",
+      "newEstPrdCnt": 1,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T001",
+      "objL1": "ALL",
+      "objL2": "ALL"
     }
   ],
-  "include_source_raw": false,
   "output_subdir": "population/incheon",
   "output_prefix": "1-25_일에대한만족도_인천_특성별",
   "views": [
     {
-      "kind": "pivot",
-      "source": "job_satisfaction",
-      "repeat_over": {
-        "items": [
-          {
-            "sheet": "전체",
-            "codes": [
-              "A01"
-            ]
-          },
-          {
-            "sheet": "군구별",
-            "codes": [
-              "A01",
-              "A0201",
-              "A0202",
-              "A0203",
-              "A0204",
-              "A0205",
-              "A0206",
-              "A0207",
-              "A0208",
-              "A0209",
-              "A0210"
-            ]
-          },
-          {
-            "sheet": "성별",
-            "codes": [
-              "A01",
-              "A0301",
-              "A0302"
-            ]
-          },
-          {
-            "sheet": "연령별",
-            "codes": [
-              "A01",
-              "A0401",
-              "A0402",
-              "A0403",
-              "A0404",
-              "A0405",
-              "A0406"
-            ]
-          },
-          {
-            "sheet": "학력별",
-            "codes": [
-              "A01",
-              "A0501",
-              "A0502",
-              "A0503",
-              "A0504"
-            ]
-          },
-          {
-            "sheet": "직업별",
-            "codes": [
-              "A01",
-              "A0601",
-              "A0602",
-              "A0603",
-              "A0604",
-              "A0605",
-              "A0606",
-              "A0607",
-              "A0608"
-            ]
-          },
-          {
-            "sheet": "월평균소득",
-            "codes": [
-              "A01",
-              "A0701",
-              "A0702",
-              "A0703",
-              "A0704",
-              "A0705",
-              "A0706",
-              "A0707",
-              "A0708"
-            ]
-          },
-          {
-            "sheet": "주거형태",
-            "codes": [
-              "A01",
-              "A0801",
-              "A0802",
-              "A0803",
-              "A0804"
-            ]
-          },
-          {
-            "sheet": "주거점유",
-            "codes": [
-              "A01",
-              "A0901",
-              "A0902",
-              "A0903"
-            ]
-          },
-          {
-            "sheet": "가구원수",
-            "codes": [
-              "A01",
-              "A1001",
-              "A1002",
-              "A1003",
-              "A1004",
-              "A1005"
-            ]
-          }
-        ]
-      },
-      "sheet_name": "{sheet}",
+      "kind": "dual_label_latest_compare",
+      "sources": [
+        "job_itself",
+        "job_income",
+        "job_hours",
+        "job_environment",
+        "job_overall"
+      ],
+      "sheet_name": "TABLE_VIEW",
+      "period": "2025",
       "filters": {
-        "C1": "{codes}",
-        "PRD_DE": [
-          "2025"
+        "C1_NM": [
+          "전체"
         ]
       },
-      "index": [
-        "C1_NM"
+      "row_key_col": "SOURCE_NAME",
+      "metric_col": "C2_NM",
+      "entries": [
+        {
+          "key": "job_itself",
+          "group": "하는 일",
+          "detail": ""
+        },
+        {
+          "key": "job_income",
+          "group": "임금/가구소득",
+          "detail": ""
+        },
+        {
+          "key": "job_hours",
+          "group": "근로시간",
+          "detail": ""
+        },
+        {
+          "key": "job_environment",
+          "group": "근무환경",
+          "detail": ""
+        },
+        {
+          "key": "job_overall",
+          "group": "전반적인 만족도",
+          "detail": ""
+        }
       ],
-      "columns": [
-        "C2_NM",
-        "C3_NM"
+      "group_label": "구분",
+      "detail_label": "세부",
+      "metric_order": [
+        "매우 불만족 (%)",
+        "약간 불만족 (%)",
+        "보통 (%)",
+        "약간 만족 (%)",
+        "매우 만족 (%)"
       ],
-      "values": "DT",
-      "preserve_multiindex_columns": true,
-      "sort": false
-    },
-    {
-      "kind": "pivot",
-      "source": "job_satisfaction",
-      "sheet_name": "SUMMARY_VIEW",
-      "filters": {
-        "C1": [
-          "A01"
-        ],
-        "PRD_DE": [
-          "2025"
-        ]
+      "metric_label_map": {
+        "매우 불만족 (%)": "매우 불만족",
+        "약간 불만족 (%)": "약간 불만족",
+        "보통 (%)": "보통",
+        "약간 만족 (%)": "약간 만족",
+        "매우 만족 (%)": "매우 만족"
       },
-      "index": [
-        "C2_NM"
-      ],
-      "columns": [
-        "C3_NM"
-      ],
-      "values": "DT",
-      "sort": false
+      "value_round_map": {
+        "매우 불만족 (%)": 1,
+        "약간 불만족 (%)": 1,
+        "보통 (%)": 1,
+        "약간 만족 (%)": 1,
+        "매우 만족 (%)": 1
+      }
     }
   ],
   "scope_regions": [
-    "??"
+    "인천광역시"
   ],
   "scope_type": "incheon",
   "scope_all_regions": false,
-  "maintenance_review_20260513": [
-    "2025 ?? ???? ?? ??? ?? ??"
+  "maintenance_review_20260603": [
+    "2025년 원천이 항목별 개별 표(A069~A073)로 분리되어 있어 다중 소스로 재구성",
+    "가공표는 전체 응답 기준 만족도 분포만 사용"
   ]
 }

@@ -23,6 +23,7 @@ def run_kosis_sources_job(job: dict) -> Tuple[Any, Any, str]:
         if not src_name:
             raise RuntimeError("Each source needs a non-empty name")
         d = fetch_kosis_df(src, api_key)
+        d["SOURCE_NAME"] = src_name
         d = apply_row_filters(d, src.get("filters", {}))
         if isinstance(src.get("preprocess"), dict):
             d = apply_preprocess(d, {"preprocess": src["preprocess"]})

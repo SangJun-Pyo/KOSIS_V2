@@ -22,6 +22,12 @@
       "kind": "sum_pivot",
       "source": "population_age",
       "sheet_name": "가임여성인구",
+      "preprocess": {
+        "latest_periods": {
+          "source": "PRD_DE",
+          "last_n": 5
+        }
+      },
       "groupby": [
         "C1",
         "C1_NM",
@@ -63,13 +69,6 @@
           "37",
           "38",
           "39"
-        ],
-        "PRD_DE": [
-          "2021",
-          "2022",
-          "2023",
-          "2024",
-          "2025"
         ]
       },
       "sort": false
@@ -78,6 +77,12 @@
       "kind": "pivot",
       "source": "population_age",
       "sheet_name": "고령인구",
+      "preprocess": {
+        "latest_periods": {
+          "source": "PRD_DE",
+          "last_n": 5
+        }
+      },
       "index": [
         "C1_NM"
       ],
@@ -111,13 +116,6 @@
           "37",
           "38",
           "39"
-        ],
-        "PRD_DE": [
-          "2021",
-          "2022",
-          "2023",
-          "2024",
-          "2025"
         ]
       },
       "sort": false
@@ -126,19 +124,19 @@
       "kind": "ratio_timeseries",
       "source": "population_age",
       "sheet_name": "지방소멸지수",
+      "preprocess": {
+        "latest_periods": {
+          "source": "PRD_DE",
+          "last_n": 5
+        }
+      },
       "region_col": "C1_NM",
       "groupby": [
         "C1",
         "C1_NM",
         "PRD_DE"
       ],
-      "years": [
-        "2021",
-        "2022",
-        "2023",
-        "2024",
-        "2025"
-      ],
+      "latest_years_count": 5,
       "numerator_filters": {
         "ITM_ID": [
           "T02"
@@ -201,11 +199,9 @@
       "area_label": "구분",
       "national_name": "전국",
       "national_alias": "계",
-      "cagr_label": "CAGR('21~'25)",
       "stage_label": "소멸위험 5단계",
-      "latest_year": "2025",
       "subtotal": {
-        "label": "8???? ??",
+        "label": "8개 광역시 평균",
         "members": [
           "서울특별시",
           "부산광역시",

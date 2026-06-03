@@ -19,16 +19,27 @@ def make_ratio_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFra
     if not isinstance(groupby, list) or not groupby:
         raise RuntimeError("ratio timeseries requires non-empty groupby")
 
-    years = [str(y) for y in pivot_cfg.get("years", [])]
-    if not years:
-        raise RuntimeError("ratio timeseries requires non-empty years")
-
     numerator_filters = pivot_cfg.get("numerator_filters", {})
     denominator_filters = pivot_cfg.get("denominator_filters", {})
 
     work = df.copy()
     work["PRD_DE"] = work["PRD_DE"].astype(str)
     work["DT"] = pd.to_numeric(work["DT"], errors="coerce").fillna(0)
+
+    years = [str(y) for y in pivot_cfg.get("years", [])]
+    latest_years_count = int(pivot_cfg.get("latest_years_count", 0) or 0)
+    if not years:
+        unique_years = sorted(
+            {str(v).strip() for v in work["PRD_DE"].dropna().astype(str)},
+            key=lambda x: int(x) if str(x).isdigit() else str(x),
+        )
+        if latest_years_count > 0:
+            years = unique_years[-latest_years_count:]
+        else:
+            years = unique_years
+    if not years:
+        raise RuntimeError("ratio timeseries requires non-empty years")
+
     work = work[work["PRD_DE"].isin(years)].copy()
 
     num = apply_row_filters(work, numerator_filters)

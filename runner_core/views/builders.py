@@ -16,9 +16,11 @@ from runner_core.pivots.ranking import (
 from runner_core.pivots.ratio import make_ratio_timeseries_pivot
 from runner_core.pivots.summary import (
     make_age_distribution_summary_pivot,
+    make_category_timeseries_summary_pivot,
     make_dual_label_latest_compare_pivot,
     make_dual_label_timeseries_summary_pivot,
     make_group_metric_share_summary_pivot,
+    make_hierarchy_timeseries_summary_pivot,
     make_latest_metric_matrix_pivot,
     make_latest_metric_share_summary_pivot,
     make_metric_block_summary_pivot,
@@ -94,8 +96,12 @@ def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
         return make_rank_and_metric_block_summary_pivot(d, spec)
     if kind == "age_distribution_summary":
         return make_age_distribution_summary_pivot(d, spec)
+    if kind == "category_timeseries_summary":
+        return make_category_timeseries_summary_pivot(d, spec)
     if kind == "row_timeseries":
         return make_row_timeseries_pivot(d, spec_for_pivot)
+    if kind == "hierarchy_timeseries_summary":
+        return make_hierarchy_timeseries_summary_pivot(d, spec)
     if kind == "latest_metric_share_summary":
         return make_latest_metric_share_summary_pivot(d, spec)
     if kind == "latest_metric_matrix":

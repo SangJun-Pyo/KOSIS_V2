@@ -1,6 +1,7 @@
 {
   "job_name": "1-24_월평균총가구소득_인천_특성별",
   "provider": "kosis_sources",
+  "include_source_raw": false,
   "sources": [
     {
       "name": "income_distribution",
@@ -15,156 +16,23 @@
       "objL2": "ALL"
     }
   ],
-  "include_source_raw": false,
   "output_subdir": "population/incheon",
   "output_prefix": "1-24_월평균총가구소득_인천_특성별",
   "views": [
     {
       "kind": "pivot",
       "source": "income_distribution",
-      "repeat_over": {
-        "items": [
-          {
-            "sheet": "전체",
-            "codes": [
-              "A01"
-            ]
-          },
-          {
-            "sheet": "군구별",
-            "codes": [
-              "A01",
-              "A0201",
-              "A0202",
-              "A0203",
-              "A0204",
-              "A0205",
-              "A0206",
-              "A0207",
-              "A0208",
-              "A0209",
-              "A0210"
-            ]
-          },
-          {
-            "sheet": "성별",
-            "codes": [
-              "A01",
-              "A0301",
-              "A0302"
-            ]
-          },
-          {
-            "sheet": "연령별",
-            "codes": [
-              "A01",
-              "A0401",
-              "A0402",
-              "A0403",
-              "A0404",
-              "A0405",
-              "A0406"
-            ]
-          },
-          {
-            "sheet": "학력별",
-            "codes": [
-              "A01",
-              "A0501",
-              "A0502",
-              "A0503",
-              "A0504"
-            ]
-          },
-          {
-            "sheet": "직업별",
-            "codes": [
-              "A01",
-              "A0601",
-              "A0602",
-              "A0603",
-              "A0604",
-              "A0605",
-              "A0606",
-              "A0607",
-              "A0608"
-            ]
-          },
-          {
-            "sheet": "월평균소득",
-            "codes": [
-              "A01",
-              "A0701",
-              "A0702",
-              "A0703",
-              "A0704",
-              "A0705",
-              "A0706",
-              "A0707",
-              "A0708"
-            ]
-          },
-          {
-            "sheet": "주거형태",
-            "codes": [
-              "A01",
-              "A0801",
-              "A0802",
-              "A0803",
-              "A0804"
-            ]
-          },
-          {
-            "sheet": "주거점유",
-            "codes": [
-              "A01",
-              "A0901",
-              "A0902",
-              "A0903"
-            ]
-          },
-          {
-            "sheet": "가구원수",
-            "codes": [
-              "A01",
-              "A1001",
-              "A1002",
-              "A1003",
-              "A1004",
-              "A1005"
-            ]
-          }
-        ]
-      },
-      "sheet_name": "{sheet}",
-      "filters": {
-        "C1": "{codes}"
-      },
-      "index": [
-        "C1_NM"
-      ],
-      "columns": [
-        "PRD_DE",
-        "C2_NM"
-      ],
-      "values": "DT",
-      "sort": false,
-      "preserve_multiindex_columns": true
-    },
-    {
-      "kind": "pivot",
-      "source": "income_distribution",
-      "sheet_name": "SUMMARY_VIEW",
+      "sheet_name": "TABLE_VIEW",
       "filters": {
         "C1": [
           "A01"
         ],
         "PRD_DE": [
-          "2020",
           "2021",
           "2022",
           "2023",
-          "2024"
+          "2024",
+          "2025"
         ]
       },
       "index": [
@@ -178,11 +46,12 @@
     }
   ],
   "scope_regions": [
-    "??"
+    "인천광역시"
   ],
   "scope_type": "incheon",
   "scope_all_regions": false,
-  "maintenance_review_20260513": [
-    "5?? ??? ??? ???? ???? ?? ??"
+  "maintenance_review_20260603": [
+    "가공표는 전체 가구 기준 소득구간 분포만 사용",
+    "최근 5개년 필터를 2021~2025로 정리"
   ]
 }

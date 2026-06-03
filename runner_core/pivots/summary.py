@@ -1,4 +1,5 @@
 from decimal import Decimal, ROUND_HALF_UP
+import re
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -15,6 +16,15 @@ def _format_rounded_value(val: Any, digits: int | None) -> Any:
     if digits == 0:
         return int(rounded)
     return float(rounded)
+
+
+def _format_period_label(period: str) -> str:
+    text = str(period).strip()
+    if re_match := re.match(r"^(\d{4})$", text):
+        return f"{re_match.group(1)}년"
+    if re_match := re.match(r"^(\d{4})\.([1-4])/4$", text):
+        return f"{re_match.group(1)}년 {re_match.group(2)}분기"
+    return text
 
 
 def make_metric_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
@@ -501,6 +511,7 @@ def make_single_metric_share_summary_pivot(
     region_order = [str(x) for x in pivot_cfg.get("region_order", [])]
     if not region_order:
         region_order = list(pv.index.astype(str))
+    region_alias_map = {str(k): str(v) for k, v in pivot_cfg.get("region_alias_map", {}).items()}
 
     share_base_filters = pivot_cfg.get("share_base_filters", {})
     share_base_year = str(pivot_cfg.get("share_base_year", share_year))
@@ -523,7 +534,9 @@ def make_single_metric_share_summary_pivot(
         if region not in pv.index and not (preserve_text_values and raw_pv is not None and region in raw_pv.index):
             continue
         rec = pv.loc[region] if region in pv.index else pd.Series(index=years, dtype="object")
-        row: Dict[str, Any] = {area_label: national_alias if region == national_name else region}
+        row: Dict[str, Any] = {
+            area_label: national_alias if region == national_name else region_alias_map.get(region, region)
+        }
         digits = value_round_map.get(str(region), value_round)
         for year in years:
             value = _format_rounded_value(rec.get(year), digits)
@@ -832,6 +845,201 @@ def make_row_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame
                 converted.append(float(num_val))
         out[col] = pd.Series(converted, dtype="object")
     return out
+
+
+def make_category_timeseries_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
+    required = ["PRD_DE", "DT"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"category_timeseries_summary columns missing: {missing}")
+
+    category_col = str(pivot_cfg.get("category_col", "")).strip()
+    if not category_col or category_col not in df.columns:
+        raise RuntimeError("category_timeseries_summary requires valid category_col")
+
+    years = [str(y) for y in pivot_cfg.get("years", [])]
+    if not years:
+        raise RuntimeError("category_timeseries_summary requires non-empty years")
+
+    d = df.copy()
+    d["PRD_DE"] = d["PRD_DE"].astype(str)
+    d = d[d["PRD_DE"].isin(years)].copy()
+    d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+    d[category_col] = d[category_col].astype(str)
+
+    category_order = [str(x) for x in pivot_cfg.get("category_order", [])]
+    if not category_order:
+        category_order = list(dict.fromkeys(d[category_col].astype(str)))
+
+    pv = d.pivot_table(
+        index=category_col,
+        columns="PRD_DE",
+        values="DT",
+        aggfunc="first",
+        sort=False,
+        observed=True,
+    )
+    for year in years:
+        if year not in pv.columns:
+            pv[year] = pd.NA
+    pv = pv[years]
+
+    row_label = str(pivot_cfg.get("row_label", "구분"))
+    include_share = bool(pivot_cfg.get("include_share", False))
+    share_year = str(pivot_cfg.get("share_year", years[-1]))
+    share_base_key = str(pivot_cfg.get("share_base_key", category_order[0] if category_order else "")).strip()
+    include_cagr = bool(pivot_cfg.get("include_cagr", True))
+    cagr_label = str(pivot_cfg.get("cagr_label", f"CAGR('{years[0][:4][2:]}~'{years[-1][:4][2:]})"))
+    periods = max(int(years[-1][:4]) - int(years[0][:4]), 1)
+    value_round = pivot_cfg.get("value_round")
+    value_round = int(value_round) if value_round is not None else None
+    year_label_map = {str(k): str(v) for k, v in pivot_cfg.get("year_label_map", {}).items()}
+    if not year_label_map:
+        year_label_map = {year: _format_period_label(year) for year in years}
+
+    share_base = pd.NA
+    if include_share and share_base_key and share_base_key in pv.index and share_year in pv.columns:
+        share_base = pd.to_numeric(pv.loc[share_base_key, share_year], errors="coerce")
+
+    rows: List[Dict[str, Any]] = []
+    for key in category_order:
+        if key not in pv.index:
+            continue
+        rec = pv.loc[key]
+        row: Dict[str, Any] = {row_label: key}
+        for year in years:
+            row[year_label_map.get(year, year)] = _format_rounded_value(rec.get(year), value_round)
+
+        latest_val = pd.to_numeric(rec.get(share_year), errors="coerce")
+        start_val = pd.to_numeric(rec.get(years[0]), errors="coerce")
+        end_val = pd.to_numeric(rec.get(years[-1]), errors="coerce")
+        if include_share:
+            row["비중"] = (
+                round((latest_val / share_base) * 100, 1)
+                if pd.notna(latest_val) and pd.notna(share_base) and share_base not in (0, 0.0)
+                else pd.NA
+            )
+        if include_cagr:
+            row[cagr_label] = (
+                round((((end_val / start_val) ** (1 / periods)) - 1) * 100, 1)
+                if pd.notna(start_val) and pd.notna(end_val) and start_val > 0 and end_val > 0
+                else pd.NA
+            )
+        rows.append(row)
+
+    columns = [row_label] + [year_label_map.get(year, year) for year in years]
+    if include_share:
+        columns.append("비중")
+    if include_cagr:
+        columns.append(cagr_label)
+    return pd.DataFrame(rows, columns=columns)
+
+
+def make_hierarchy_timeseries_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
+    required = ["PRD_DE", "DT"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"hierarchy_timeseries_summary columns missing: {missing}")
+
+    group_col = str(pivot_cfg.get("group_col", "")).strip()
+    detail_col = str(pivot_cfg.get("detail_col", "")).strip()
+    order_col = str(pivot_cfg.get("order_col", "")).strip()
+    if not group_col or group_col not in df.columns:
+        raise RuntimeError("hierarchy_timeseries_summary requires valid group_col")
+    if not detail_col or detail_col not in df.columns:
+        raise RuntimeError("hierarchy_timeseries_summary requires valid detail_col")
+
+    years = [str(y) for y in pivot_cfg.get("years", [])]
+    if not years:
+        raise RuntimeError("hierarchy_timeseries_summary requires non-empty years")
+
+    d = df.copy()
+    d["PRD_DE"] = d["PRD_DE"].astype(str)
+    d = d[d["PRD_DE"].isin(years)].copy()
+    d["DT"] = pd.to_numeric(d["DT"], errors="coerce")
+    d[group_col] = d[group_col].astype(str)
+    d[detail_col] = d[detail_col].fillna("").astype(str)
+    if order_col and order_col in d.columns:
+        d[order_col] = pd.to_numeric(d[order_col], errors="coerce")
+
+    index_cols = [group_col, detail_col]
+    if order_col and order_col in d.columns:
+        index_cols.append(order_col)
+    index_cols = list(dict.fromkeys(index_cols))
+    pv = d.pivot_table(
+        index=index_cols,
+        columns="PRD_DE",
+        values="DT",
+        aggfunc="first",
+        sort=False,
+        observed=True,
+    )
+    for year in years:
+        if year not in pv.columns:
+            pv[year] = pd.NA
+    pv = pv[years].reset_index()
+
+    if order_col and order_col in pv.columns:
+        pv = pv.sort_values([order_col, group_col, detail_col], kind="stable")
+    else:
+        pv = pv.sort_values([group_col, detail_col], kind="stable")
+
+    group_label = str(pivot_cfg.get("group_label", "구분"))
+    detail_label = str(pivot_cfg.get("detail_label", "세부"))
+    include_share = bool(pivot_cfg.get("include_share", False))
+    share_year = str(pivot_cfg.get("share_year", years[-1]))
+    share_base_key = str(pivot_cfg.get("share_base_key", "계")).strip()
+    include_cagr = bool(pivot_cfg.get("include_cagr", True))
+    cagr_label = str(pivot_cfg.get("cagr_label", f"CAGR('{years[0][:4][2:]}~'{years[-1][:4][2:]})"))
+    periods = max(int(years[-1][:4]) - int(years[0][:4]), 1)
+    value_round = pivot_cfg.get("value_round")
+    value_round = int(value_round) if value_round is not None else None
+    year_label_map = {str(k): str(v) for k, v in pivot_cfg.get("year_label_map", {}).items()}
+    if not year_label_map:
+        year_label_map = {year: _format_period_label(year) for year in years}
+
+    base_val = pd.NA
+    if include_share:
+        base_rows = pv[(pv[group_col] == share_base_key) & (pv[detail_col].astype(str).isin(["", "소계"]))]
+        if base_rows.empty:
+            base_rows = pv[pv[group_col] == share_base_key]
+        if not base_rows.empty:
+            base_val = pd.to_numeric(base_rows.iloc[0].get(share_year), errors="coerce")
+
+    rows: List[Dict[str, Any]] = []
+    last_group = None
+    for _, rec in pv.iterrows():
+        row: Dict[str, Any] = {
+            group_label: rec[group_col] if rec[group_col] != last_group else "",
+            detail_label: rec[detail_col],
+        }
+        for year in years:
+            row[year_label_map.get(year, year)] = _format_rounded_value(rec.get(year), value_round)
+
+        latest_val = pd.to_numeric(rec.get(share_year), errors="coerce")
+        start_val = pd.to_numeric(rec.get(years[0]), errors="coerce")
+        end_val = pd.to_numeric(rec.get(years[-1]), errors="coerce")
+        if include_share:
+            row["비중"] = (
+                round((latest_val / base_val) * 100, 1)
+                if pd.notna(latest_val) and pd.notna(base_val) and base_val not in (0, 0.0)
+                else pd.NA
+            )
+        if include_cagr:
+            row[cagr_label] = (
+                round((((end_val / start_val) ** (1 / periods)) - 1) * 100, 1)
+                if pd.notna(start_val) and pd.notna(end_val) and start_val > 0 and end_val > 0
+                else pd.NA
+            )
+        rows.append(row)
+        last_group = rec[group_col]
+
+    columns = [group_label, detail_label] + [year_label_map.get(year, year) for year in years]
+    if include_share:
+        columns.append("비중")
+    if include_cagr:
+        columns.append(cagr_label)
+    return pd.DataFrame(rows, columns=columns)
 
 
 def make_latest_metric_share_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:

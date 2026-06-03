@@ -47,6 +47,18 @@ def map_age_to_10y_bucket(label: Any) -> Optional[str]:
     return None
 
 
+def _period_sort_key(value: Any) -> tuple:
+    text = str(value).strip()
+    if re.fullmatch(r"\d{4}", text):
+        return (0, int(text), 0, 0)
+    if re.fullmatch(r"\d{6}", text):
+        return (1, int(text[:4]), int(text[4:6]), 0)
+    match = re.fullmatch(r"(\d{4})\.(\d)/4", text)
+    if match:
+        return (2, int(match.group(1)), int(match.group(2)), 0)
+    return (9, text, 0, 0)
+
+
 def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
     cfg = job.get("preprocess", {})
     if not isinstance(cfg, dict) or not cfg:
@@ -163,6 +175,53 @@ def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
         d = d.groupby(group_cols + ["__YEAR__"], as_index=False, dropna=False, sort=False, observed=True)["DT"].mean()
         d = d.rename(columns={"__YEAR__": src})
 
+    quarter_pick_cfg = cfg.get("quarter_pick_latest_or_q4")
+    if quarter_pick_cfg:
+        if not isinstance(quarter_pick_cfg, dict):
+            raise RuntimeError("preprocess.quarter_pick_latest_or_q4 must be a dict")
+        src = str(quarter_pick_cfg.get("source", "PRD_DE"))
+        if src not in d.columns:
+            raise RuntimeError(f"preprocess source column missing: {src}")
+
+        work = d.copy()
+        work[src] = work[src].astype(str)
+        parsed = work[src].str.extract(
+            r"^(?:(?P<year_a>\d{4})\.(?P<quarter_a>[1-4])/4|(?P<year_b>\d{4})0(?P<quarter_b>[1-4]))$"
+        )
+        year_series = parsed["year_a"].fillna(parsed["year_b"])
+        quarter_series = parsed["quarter_a"].fillna(parsed["quarter_b"])
+        work = work[year_series.notna()].copy()
+        if work.empty:
+            return work
+
+        work["__YEAR__"] = year_series.loc[work.index].astype(str)
+        work["__QUARTER__"] = pd.to_numeric(quarter_series.loc[work.index], errors="coerce")
+        selected_periods: list[str] = []
+        for year, block in work.groupby("__YEAR__", sort=True, observed=True):
+            q4 = block[block["__QUARTER__"] == 4]
+            if not q4.empty:
+                selected_periods.extend(q4[src].astype(str).tolist())
+                continue
+            latest_q = pd.to_numeric(block["__QUARTER__"], errors="coerce").max()
+            latest = block[block["__QUARTER__"] == latest_q]
+            selected_periods.extend(latest[src].astype(str).tolist())
+
+        d = work[work[src].astype(str).isin(selected_periods)].copy()
+        d[src] = d["__YEAR__"].astype(str) + "." + d["__QUARTER__"].astype("Int64").astype(str) + "/4"
+        d = d.drop(columns=["__YEAR__", "__QUARTER__"], errors="ignore")
+
+    latest_periods_cfg = cfg.get("latest_periods")
+    if latest_periods_cfg:
+        if not isinstance(latest_periods_cfg, dict):
+            raise RuntimeError("preprocess.latest_periods must be a dict")
+        src = str(latest_periods_cfg.get("source", "PRD_DE"))
+        if src not in d.columns:
+            raise RuntimeError(f"preprocess source column missing: {src}")
+        last_n = int(latest_periods_cfg.get("last_n", 5))
+        unique_periods = sorted({str(v).strip() for v in d[src].dropna().astype(str)}, key=_period_sort_key)
+        keep = set(unique_periods[-last_n:]) if last_n > 0 else set(unique_periods)
+        d = d[d[src].astype(str).isin(keep)].copy()
+
     scale_dt_cfg = cfg.get("scale_dt")
     if scale_dt_cfg:
         if "DT" not in d.columns:
@@ -255,6 +314,41 @@ def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
         else:
             d = grouped.sum()
 
+    hierarchy_cfg = cfg.get("hierarchy_map")
+    if hierarchy_cfg:
+        if not isinstance(hierarchy_cfg, dict):
+            raise RuntimeError("preprocess.hierarchy_map must be a dict")
+        code_col = str(hierarchy_cfg.get("code_col", "")).strip()
+        group_col = str(hierarchy_cfg.get("group_col", "GROUP_NM")).strip()
+        detail_col = str(hierarchy_cfg.get("detail_col", "DETAIL_NM")).strip()
+        order_col = str(hierarchy_cfg.get("order_col", "DISPLAY_ORDER")).strip()
+        if not code_col or code_col not in d.columns:
+            raise RuntimeError(f"preprocess source column missing: {code_col}")
+        mapping = hierarchy_cfg.get("mapping", {})
+        if not isinstance(mapping, dict) or not mapping:
+            raise RuntimeError("hierarchy_map requires non-empty mapping")
+
+        keep_unmapped = bool(hierarchy_cfg.get("keep_unmapped", False))
+        normalized_mapping = {str(k): v for k, v in mapping.items()}
+        codes = d[code_col].astype(str)
+        mapped = codes.map(normalized_mapping)
+        if not keep_unmapped:
+            d = d[mapped.notna()].copy()
+            codes = d[code_col].astype(str)
+            mapped = codes.map(normalized_mapping)
+
+        def _pick(mapped_value: Any, key: str, fallback: str = "") -> Any:
+            if isinstance(mapped_value, dict):
+                return mapped_value.get(key, fallback)
+            return fallback
+
+        d[group_col] = mapped.map(lambda v: _pick(v, "group", ""))
+        d[detail_col] = mapped.map(lambda v: _pick(v, "detail", ""))
+        d[order_col] = mapped.map(lambda v: _pick(v, "order", pd.NA))
+        if keep_unmapped:
+            d[group_col] = d[group_col].where(d[group_col].astype(str) != "", codes)
+            d[detail_col] = d[detail_col].fillna("")
+
     return d
 
 
@@ -270,6 +364,7 @@ def substitute_template(value: Any, mapping: Dict[str, Any]) -> Any:
     if isinstance(value, str):
         out = value
         for k, v in mapping.items():
+            out = out.replace(f"{{{k}}}", str(v))
             out = out.replace(f"{{{{{k}}}}}", str(v))
         return out
     if isinstance(value, list):
