@@ -90,13 +90,9 @@
       "region_col": "C1_NM",
       "row_label": "항목",
       "years": [
-        "2020",
-        "2021",
-        "2022",
-        "2023",
-        "2024"
+        "__LATEST_5_YEARS__"
       ],
-      "detail_year": "2024",
+      "detail_year": "__LATEST_YEAR__",
       "total_label": "계",
       "detail_labels": [
         "남자",
@@ -146,7 +142,7 @@
           "23"
         ]
       },
-      "year": "2024",
+      "year": "__LATEST_YEAR__",
       "sex_col": "C2_NM",
       "total_item_id": "T10",
       "item_order": [
@@ -184,11 +180,7 @@
         ]
       },
       "years": [
-        "2020",
-        "2021",
-        "2022",
-        "2023",
-        "2024"
+        "__LATEST_5_YEARS__"
       ],
       "sex_col": "C2_NM",
       "item_order": [
@@ -215,7 +207,7 @@
         "T35",
         "T36"
       ],
-      "cagr_label": "CAGR('20~'24)"
+      "cagr_label": "__AUTO_CAGR_LABEL__"
     }
   ],
   "scope_all_regions": true,
@@ -224,5 +216,5 @@
   "maintenance_review_20260513": [
     "2024 ?? ?? ?? ?? ??"
   ],
-  "latest_confirmed_year": "2024"
+  "latest_confirmed_year": "__LATEST_YEAR__"
 }

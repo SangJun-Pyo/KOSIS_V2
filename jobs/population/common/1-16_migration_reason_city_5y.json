@@ -35,7 +35,7 @@
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T10 T20",
-      "objL1": "00",
+      "objL1": "28",
       "objL2": "ALL"
     }
   ],
@@ -93,13 +93,9 @@
         "T20": "총전출"
       },
       "years": [
-        "2021",
-        "2022",
-        "2023",
-        "2024",
-        "2025"
+        "__LATEST_5_YEARS__"
       ],
-      "cagr_label": "CAGR('21~'25)"
+      "cagr_label": "__AUTO_CAGR_LABEL__"
     }
   ],
   "scope_all_regions": true,

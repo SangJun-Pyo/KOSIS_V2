@@ -1,7 +1,7 @@
 {
   "job_name": "2-03_경기종합지수_인천전국_12월_최근5개년",
   "provider": "kosis_sources",
-  "include_source_raw": false,
+  "include_source_raw": true,
   "sources": [
     {
       "name": "incheon_index",

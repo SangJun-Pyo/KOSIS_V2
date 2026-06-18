@@ -27,11 +27,12 @@
         {
           "title": "취업자 수",
           "source": "incheon_age_employed",
-          "kind": "single_metric_share_summary",
+          "kind": "single_metric_year_share_summary",
           "preprocess": {
             "category_map_aggregate": {
               "source": "C2_NM",
               "target": "AGE_GROUP",
+              "round_before_aggregate": 0,
               "agg": "sum",
               "mapping": {
                 "계": "계",
@@ -83,9 +84,17 @@
           "area_label": "구분",
           "national_name": "계",
           "national_alias": "계",
-          "share_year": "2025",
-          "include_share": true,
-          "value_round": 1,
+          "share_base_key": "계",
+          "share_label": "비중",
+          "share_as_percent": false,
+          "share_round": 4,
+          "year_label_map": {
+            "2022": "2022년 하",
+            "2023": "2023년 하",
+            "2024": "2024년 하",
+            "2025": "2025년 하"
+          },
+          "value_round": 0,
           "cagr_label": "CAGR('22~'25)",
           "region_order": [
             "계",
@@ -94,6 +103,7 @@
             "장년(50~64세)",
             "노년(65세 이상)"
           ],
+          "flatten": false,
           "blank_rows": 0
         }
       ]

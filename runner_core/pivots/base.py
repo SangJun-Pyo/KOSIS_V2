@@ -1,6 +1,7 @@
 from typing import Optional
 
 import pandas as pd
+from runner_core.periods import available_periods, resolve_period_list
 
 def make_default_pivot(df: pd.DataFrame) -> Optional[pd.DataFrame]:
     if "DT" not in df.columns or "PRD_DE" not in df.columns:
@@ -45,7 +46,7 @@ def make_custom_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
 
     d = df.copy()
 
-    # Optional row filters before pivot, e.g. {"PRD_DE": ["2015", "2025"]}
+    # Optional row filters before pivot, e.g. {"PRD_DE": ["2015", "__LATEST_YEAR__"]}
     filters = pivot_cfg.get("filters", {})
     if filters:
         if not isinstance(filters, dict):
@@ -54,7 +55,10 @@ def make_custom_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
             if col not in d.columns:
                 raise RuntimeError(f"pivot.filters column missing: {col}")
             allowed_vals = allowed if isinstance(allowed, list) else [allowed]
-            allowed_vals = [str(v) for v in allowed_vals]
+            if col == "PRD_DE":
+                allowed_vals = resolve_period_list(allowed_vals, available_periods(d[col].astype(str).tolist()))
+            else:
+                allowed_vals = [str(v) for v in allowed_vals]
             d = d[d[col].astype(str).isin(allowed_vals)]
 
     if val in d.columns:

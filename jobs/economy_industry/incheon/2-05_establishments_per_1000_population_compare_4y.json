@@ -194,6 +194,8 @@
             "2023": "2023년",
             "2024": "2024년"
           },
+          "include_cagr": true,
+          "cagr_label": "CAGR",
           "value_round": 0,
           "repeat_group_label": false
         },
@@ -233,6 +235,8 @@
             "2023": "2023년",
             "2024": "2024년"
           },
+          "include_cagr": true,
+          "cagr_label": "CAGR",
           "value_round": 0,
           "repeat_group_label": false
         },
@@ -272,6 +276,8 @@
             "2023": "2023년",
             "2024": "2024년"
           },
+          "include_cagr": true,
+          "cagr_label": "CAGR",
           "value_round": 0,
           "repeat_group_label": false
         }

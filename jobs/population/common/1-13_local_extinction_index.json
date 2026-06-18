@@ -1,23 +1,93 @@
 {
   "job_name": "1-13_지방소멸지수_광역비교",
   "provider": "kosis_sources",
+  "include_source_raw": false,
   "sources": [
     {
       "name": "population_age",
       "orgId": "101",
       "tblId": "DT_1IN1503",
       "prdSe": "Y",
-      "newEstPrdCnt": 6,
+      "newEstPrdCnt": 5,
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T00 T02",
       "objL1": "00 11 21 22 23 24 25 26 29 31 32 33 34 35 36 37 38 39",
-      "objL2": "025 030 035 040 104"
+      "objL2": "025 030 035 040 070 075 080 085 090 095 100"
     }
   ],
   "output_subdir": "population/common",
   "output_prefix": "1-13_지방소멸지수_광역비교",
   "views": [
+    {
+      "kind": "pivot",
+      "source": "population_age",
+      "sheet_name": "가임여성인구_상세",
+      "preprocess": {
+        "latest_periods": {
+          "source": "PRD_DE",
+          "last_n": 5
+        }
+      },
+      "index": [
+        "C1_NM"
+      ],
+      "columns": [
+        "PRD_DE",
+        "C2_NM"
+      ],
+      "values": "DT",
+      "filters": {
+        "ITM_ID": [
+          "T02"
+        ],
+        "C2": [
+          "025",
+          "030",
+          "035",
+          "040"
+        ]
+      },
+      "preserve_multiindex_columns": true,
+      "flatten_columns_year": false,
+      "sort": false
+    },
+    {
+      "kind": "pivot",
+      "source": "population_age",
+      "sheet_name": "고령인구_상세",
+      "preprocess": {
+        "latest_periods": {
+          "source": "PRD_DE",
+          "last_n": 5
+        }
+      },
+      "index": [
+        "C1_NM"
+      ],
+      "columns": [
+        "PRD_DE",
+        "C2_NM"
+      ],
+      "values": "DT",
+      "filters": {
+        "ITM_ID": [
+          "T00"
+        ],
+        "C2": [
+          "070",
+          "075",
+          "080",
+          "085",
+          "090",
+          "095",
+          "100"
+        ]
+      },
+      "preserve_multiindex_columns": true,
+      "flatten_columns_year": false,
+      "sort": false
+    },
     {
       "kind": "sum_pivot",
       "source": "population_age",
@@ -49,32 +119,12 @@
           "030",
           "035",
           "040"
-        ],
-        "C1": [
-          "00",
-          "11",
-          "21",
-          "22",
-          "23",
-          "24",
-          "25",
-          "26",
-          "29",
-          "31",
-          "32",
-          "33",
-          "34",
-          "35",
-          "36",
-          "37",
-          "38",
-          "39"
         ]
       },
       "sort": false
     },
     {
-      "kind": "pivot",
+      "kind": "sum_pivot",
       "source": "population_age",
       "sheet_name": "고령인구",
       "preprocess": {
@@ -83,6 +133,11 @@
           "last_n": 5
         }
       },
+      "groupby": [
+        "C1",
+        "C1_NM",
+        "PRD_DE"
+      ],
       "index": [
         "C1_NM"
       ],
@@ -95,27 +150,13 @@
           "T00"
         ],
         "C2": [
-          "104"
-        ],
-        "C1": [
-          "00",
-          "11",
-          "21",
-          "22",
-          "23",
-          "24",
-          "25",
-          "26",
-          "29",
-          "31",
-          "32",
-          "33",
-          "34",
-          "35",
-          "36",
-          "37",
-          "38",
-          "39"
+          "070",
+          "075",
+          "080",
+          "085",
+          "090",
+          "095",
+          "100"
         ]
       },
       "sort": false
@@ -146,26 +187,6 @@
           "030",
           "035",
           "040"
-        ],
-        "C1": [
-          "00",
-          "11",
-          "21",
-          "22",
-          "23",
-          "24",
-          "25",
-          "26",
-          "29",
-          "31",
-          "32",
-          "33",
-          "34",
-          "35",
-          "36",
-          "37",
-          "38",
-          "39"
         ]
       },
       "denominator_filters": {
@@ -173,27 +194,13 @@
           "T00"
         ],
         "C2": [
-          "104"
-        ],
-        "C1": [
-          "00",
-          "11",
-          "21",
-          "22",
-          "23",
-          "24",
-          "25",
-          "26",
-          "29",
-          "31",
-          "32",
-          "33",
-          "34",
-          "35",
-          "36",
-          "37",
-          "38",
-          "39"
+          "070",
+          "075",
+          "080",
+          "085",
+          "090",
+          "095",
+          "100"
         ]
       },
       "area_label": "구분",
@@ -201,7 +208,7 @@
       "national_alias": "계",
       "stage_label": "소멸위험 5단계",
       "subtotal": {
-        "label": "8개 광역시 평균",
+        "label": "8개 광역시 소계",
         "members": [
           "서울특별시",
           "부산광역시",
@@ -220,7 +227,7 @@
   "scope_type": "common",
   "scope_regions": [],
   "maintenance_review_20260513": [
-    "?????? ??? ??? 2021~2025? ??",
-    "??????/???? ?? ?? ??? ??? ??"
+    "현재 KOSIS 응답 기준 최신 5개년 자동 반영",
+    "상세 원자료 시트와 최종 가공 시트를 분리"
   ]
 }

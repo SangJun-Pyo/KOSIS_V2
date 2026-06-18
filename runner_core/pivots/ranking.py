@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 
 from runner_core.preprocess.filters import apply_row_filters
+from runner_core.periods import available_periods, resolve_cagr_label, resolve_period_list, resolve_period_value
 
 
 def _coerce_rank_value(value: Any) -> Any:
@@ -17,7 +18,8 @@ def make_latest_rank_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
     if missing:
         raise RuntimeError(f"latest rank pivot columns missing: {missing}")
 
-    year = str(pivot_cfg.get("year", "")).strip()
+    available = available_periods(df["PRD_DE"].astype(str).tolist())
+    year = resolve_period_value(pivot_cfg.get("year", ""), available).strip()
     if not year:
         raise RuntimeError("latest rank pivot requires year")
 
@@ -88,7 +90,8 @@ def make_rank_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFram
     if region_col not in df.columns:
         raise RuntimeError(f"rank timeseries region column missing: {region_col}")
 
-    years = [str(y) for y in pivot_cfg.get("years", [])]
+    available = available_periods(df["PRD_DE"].astype(str).tolist())
+    years = resolve_period_list([str(y) for y in pivot_cfg.get("years", [])], available)
     if not years:
         raise RuntimeError("rank timeseries requires non-empty years")
 
@@ -114,8 +117,8 @@ def make_rank_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFram
     national_name = str(pivot_cfg.get("national_name", "전국"))
     national_alias = str(pivot_cfg.get("national_alias", "계"))
     rank_label = str(pivot_cfg.get("rank_label", "순위"))
-    cagr_label = str(pivot_cfg.get("cagr_label", f"CAGR('{years[0][2:]}~'{years[-1][2:]})"))
-    rank_year = str(pivot_cfg.get("rank_year", years[-1]))
+    cagr_label = resolve_cagr_label(pivot_cfg.get("cagr_label"), years)
+    rank_year = resolve_period_value(pivot_cfg.get("rank_year", years[-1]), available)
 
     region_order = [str(x) for x in pivot_cfg.get("region_order", [])]
     if not region_order:
@@ -151,12 +154,14 @@ def make_rank_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFram
     subtotals = pivot_cfg.get("subtotals", [])
     if not subtotals and pivot_cfg.get("subtotal"):
         subtotals = [pivot_cfg["subtotal"]]
+    pv_by_region = pv.set_index(region_col, drop=False)
+    available_regions = set(pv_by_region.index.astype(str).tolist())
     for subtotal in subtotals:
-        members = [str(x) for x in subtotal.get("members", []) if str(x) in pv.index]
+        members = [str(x) for x in subtotal.get("members", []) if str(x) in available_regions]
         if not members:
             continue
         agg = str(subtotal.get("agg", "sum")).strip().lower()
-        subtotal_frame = pv.loc[members, years].apply(pd.to_numeric, errors="coerce")
+        subtotal_frame = pv_by_region.loc[members, years].apply(pd.to_numeric, errors="coerce")
         if agg in {"mean", "avg", "average"}:
             subtotal_vals = subtotal_frame.mean(axis=0)
         else:
@@ -176,7 +181,21 @@ def make_rank_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFram
         rows.append(row)
 
     cols = [area_label] + [f"{y}년" for y in years] + [rank_label, cagr_label]
-    return pd.DataFrame(rows, columns=cols)
+    out = pd.DataFrame(rows, columns=cols)
+    value_round = pivot_cfg.get("value_round")
+    value_round = int(value_round) if value_round is not None else None
+    subtotal_round = None
+    for subtotal in subtotals:
+        if isinstance(subtotal, dict) and subtotal.get("value_round") is not None:
+            subtotal_round = int(subtotal.get("value_round"))
+            break
+    round_digits = subtotal_round if subtotal_round is not None else value_round
+    if round_digits is not None:
+        for year in years:
+            col = f"{year}년"
+            if col in out.columns:
+                out[col] = pd.to_numeric(out[col], errors="coerce").round(round_digits)
+    return out
 
 def make_rank_and_metric_block_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
     required = ["PRD_DE", "DT"]
@@ -188,7 +207,8 @@ def make_rank_and_metric_block_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) 
     if region_col not in df.columns:
         raise RuntimeError(f"rank_and_metric_block region column missing: {region_col}")
 
-    years = [str(y) for y in pivot_cfg.get("years", [])]
+    available = available_periods(df["PRD_DE"].astype(str).tolist())
+    years = resolve_period_list([str(y) for y in pivot_cfg.get("years", [])], available)
     if not years:
         raise RuntimeError("rank_and_metric_block requires non-empty years")
 
@@ -212,9 +232,9 @@ def make_rank_and_metric_block_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) 
     out = pd.DataFrame(index=pd.Index(region_order, name=area_label))
 
     rank_label = str(rank_metric.get("rank_label", "순위"))
-    rank_cagr_label = str(rank_metric.get("cagr_label", f"CAGR('{years[0][2:]}~'{years[-1][2:]})"))
+    rank_cagr_label = resolve_cagr_label(rank_metric.get("cagr_label"), years)
     rank_title = str(rank_metric.get("label", "지표"))
-    rank_year = str(rank_metric.get("rank_year", years[-1]))
+    rank_year = resolve_period_value(rank_metric.get("rank_year", years[-1]), available)
     rank_block = apply_row_filters(work, rank_metric.get("filters", {}))
     rank_pv = rank_block.pivot_table(
         index=region_col,
@@ -250,7 +270,7 @@ def make_rank_and_metric_block_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) 
         title = str(block.get("label", "")).strip()
         if not title:
             continue
-        cagr_label = str(block.get("cagr_label", rank_cagr_label))
+        cagr_label = resolve_cagr_label(block.get("cagr_label", rank_cagr_label), years)
         block_df = apply_row_filters(work, block.get("filters", {}))
         pv = block_df.pivot_table(
             index=region_col,

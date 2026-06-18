@@ -1,33 +1,94 @@
 {
-  "job_name": "1-09_인구동태건수_동태율_기본항목별_최근6년",
-  "provider": "kosis",
-  "orgId": "101",
-  "tblId": "DT_1B8000F",
-  "prdSe": "Y",
-  "newEstPrdCnt": 6,
-  "format": "json",
-  "jsonVD": "Y",
-  "itmId": "T1",
-  "objL1": "ALL",
+  "job_name": "1-09_인구동태건수_동태율_기본항목별_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "vital_stats",
+      "orgId": "101",
+      "tblId": "DT_1B8000I",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T10 T11 T40 T41",
+      "objL1": "000 11 21 22 23 24 25 26 29 31 32 33 34 35 36 37 38 39"
+    }
+  ],
+  "raw_sheets": [
+    {
+      "source": "vital_stats",
+      "sheet_name": "RAW_DATA",
+      "filters": {
+        "C1": [
+          "23"
+        ],
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      },
+      "columns": [
+        "C1",
+        "C1_NM",
+        "PRD_DE",
+        "ITM_ID",
+        "ITM_NM",
+        "DT",
+        "UNIT_NM"
+      ]
+    }
+  ],
   "output_subdir": "population/common",
-  "output_prefix": "1-09_인구동태건수_동태율_기본항목별_최근6년",
-  "pivot": {
-    "index": [
-      "C1_NM"
-    ],
-    "columns": [
-      "PRD_DE"
-    ],
-    "values": "DT",
-    "sheet_name": "TABLE_VIEW",
-    "flatten_columns_year": false,
-    "sort": false
-  },
+  "output_prefix": "1-09_인구동태건수_동태율_기본항목별_최근5년",
+  "views": [
+    {
+      "source": "vital_stats",
+      "kind": "category_timeseries_summary",
+      "sheet_name": "TABLE_VIEW",
+      "filters": {
+        "C1": [
+          "23"
+        ],
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ],
+        "ITM_NM": [
+          "출생건수 (명)",
+          "조출생률 (천명당)",
+          "혼인건수 (건)",
+          "조혼인율 (천명당)"
+        ]
+      },
+      "category_col": "ITM_NM",
+      "years": [
+        "__LATEST_5_YEARS__"
+      ],
+      "category_order": [
+        "출생건수 (명)",
+        "조출생률 (천명당)",
+        "혼인건수 (건)",
+        "조혼인율 (천명당)"
+      ],
+      "category_alias_map": {
+        "출생건수 (명)": "출생건수",
+        "조출생률 (천명당)": "조출생률",
+        "혼인건수 (건)": "혼인건수",
+        "조혼인율 (천명당)": "조혼인율"
+      },
+      "row_label": "구분",
+      "cagr_label": "__AUTO_CAGR_LABEL__",
+      "cagr_include_keys": [
+        "혼인건수 (건)"
+      ],
+      "value_round_map": {
+        "출생건수 (명)": 0,
+        "조출생률 (천명당)": 1,
+        "혼인건수 (건)": 0,
+        "조혼인율 (천명당)": 1
+      }
+    }
+  ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": [],
-  "maintenance_review_20260513": [
-    "????/?? ???? ??? ?? ??",
-    "?? JSON? ?? ?? ?? ??? ? ?? ??"
-  ]
+  "scope_regions": []
 }

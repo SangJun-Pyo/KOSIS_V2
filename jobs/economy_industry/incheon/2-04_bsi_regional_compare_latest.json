@@ -1,7 +1,7 @@
 {
   "job_name": "2-04_지역별_경기조사_광역비교_최신월",
   "provider": "kosis_sources",
-  "include_source_raw": false,
+  "include_source_raw": true,
   "sources": [
     {
       "name": "national_bsi",
@@ -9,6 +9,8 @@
       "tblId": "DT_512Y013",
       "prdSe": "M",
       "newEstPrdCnt": 1,
+      "startPrdDe": "202512",
+      "endPrdDe": "202512",
       "itmId": "13103134673999",
       "objL1": "ALL",
       "objL2": "ALL",
@@ -82,19 +84,19 @@
       "tblId": "DT_512Y019",
       "prdSe": "M",
       "newEstPrdCnt": 1,
+      "startPrdDe": "202512",
+      "endPrdDe": "202512",
       "itmId": "13103134492999",
       "objL1": "ALL",
       "objL2": "ALL",
       "filters": {
         "C2_NM": [
-          "인천",
+          "부산",
+          "대구",
+          "광주",
           "대전",
-          "충남",
-          "충북",
-          "강원",
-          "경기",
-          "경남",
-          "대전세종충남"
+          "인천",
+          "울산"
         ]
       },
       "preprocess": {
@@ -159,16 +161,37 @@
           "비제조업 자금사정BSI"
         ]
       },
+      "index_order": [
+        "제조업 기업심리지수실적",
+        "제조업 업황BSI",
+        "제조업 매출BSI",
+        "제조업 생산BSI",
+        "제조업 신규수주BSI",
+        "제조업 채산성BSI",
+        "제조업 제품판매가격BSI",
+        "제조업 제품재고BSI",
+        "제조업 설비투자BSI",
+        "제조업 인력사정BSI",
+        "제조업 가동률BSI",
+        "제조업 내수판매BSI",
+        "제조업 수출BSI",
+        "제조업 원자재구입가격BSI",
+        "제조업 자금사정BSI",
+        "비제조업 기업심리지수실적",
+        "비제조업 업황BSI",
+        "비제조업 매출BSI",
+        "비제조업 채산성BSI",
+        "비제조업 인력사정BSI",
+        "비제조업 자금사정BSI"
+      ],
       "column_order": [
         "전국",
         "인천",
+        "부산",
+        "대구",
+        "광주",
         "대전",
-        "충남",
-        "충북",
-        "강원",
-        "경기",
-        "경남",
-        "대전세종충남"
+        "울산"
       ]
     }
   ],

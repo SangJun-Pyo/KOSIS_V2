@@ -401,13 +401,9 @@
         "약국"
       ],
       "years": [
-        "2021.4/4",
-        "2022.4/4",
-        "2023.4/4",
-        "2024.4/4",
-        "2025.4/4"
+        "__LATEST_5_PERIODS__"
       ],
-      "cagr_label": "CAGR('21~'25)"
+      "cagr_label": "__AUTO_CAGR_LABEL__"
     },
     {
       "kind": "stack_blocks",
@@ -594,13 +590,9 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
-            "2021.4/4",
-            "2022.4/4",
-            "2023.4/4",
-            "2024.4/4",
-            "2025.4/4"
+            "__LATEST_5_PERIODS__"
           ],
-          "cagr_label": "CAGR('21~'25)",
+          "cagr_label": "__AUTO_CAGR_LABEL__",
           "blank_rows": 1
         },
         {
@@ -655,13 +647,9 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
-            "2021.4/4",
-            "2022.4/4",
-            "2023.4/4",
-            "2024.4/4",
-            "2025.4/4"
+            "__LATEST_5_PERIODS__"
           ],
-          "cagr_label": "CAGR('21~'25)"
+          "cagr_label": "__AUTO_CAGR_LABEL__"
         }
       ]
     },
@@ -870,13 +858,9 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
-            "2021.4/4",
-            "2022.4/4",
-            "2023.4/4",
-            "2024.4/4",
-            "2025.4/4"
+            "__LATEST_5_PERIODS__"
           ],
-          "cagr_label": "CAGR('21~'25)",
+          "cagr_label": "__AUTO_CAGR_LABEL__",
           "blank_rows": 1
         },
         {
@@ -971,13 +955,9 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
-            "2021.4/4",
-            "2022.4/4",
-            "2023.4/4",
-            "2024.4/4",
-            "2025.4/4"
+            "__LATEST_5_PERIODS__"
           ],
-          "cagr_label": "CAGR('21~'25)",
+          "cagr_label": "__AUTO_CAGR_LABEL__",
           "blank_rows": 1
         },
         {
@@ -1032,13 +1012,9 @@
           "group_label": "구분",
           "detail_label": "세부",
           "years": [
-            "2021.4/4",
-            "2022.4/4",
-            "2023.4/4",
-            "2024.4/4",
-            "2025.4/4"
+            "__LATEST_5_PERIODS__"
           ],
-          "cagr_label": "CAGR('21~'25)"
+          "cagr_label": "__AUTO_CAGR_LABEL__"
         }
       ]
     }

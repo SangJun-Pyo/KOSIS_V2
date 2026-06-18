@@ -7,9 +7,15 @@
       "name": "welfare_satisfaction",
       "orgId": "204",
       "tblId": "DT_204010_2024A102",
+      "tblId_template": "DT_204010_{year}A102",
+      "tblId_year_fallbacks": [
+        0,
+        -1,
+        -2,
+        -3
+      ],
       "prdSe": "Y",
-      "startPrdDe": "2024",
-      "endPrdDe": "2024",
+      "startPrdDe": "{year}",
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T001",
@@ -30,7 +36,7 @@
           "전체"
         ],
         "PRD_DE": [
-          "2024"
+          "__LATEST_1_YEARS__"
         ]
       },
       "index": [
@@ -52,5 +58,5 @@
     "가공표는 서비스별 전체/소계 기준 만족도만 사용",
     "만족도 항목은 ITM_NM 열로 전개되도록 수정"
   ],
-  "latest_confirmed_year": "2024"
+  "latest_confirmed_year": "__LATEST_YEAR__"
 }

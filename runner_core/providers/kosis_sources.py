@@ -9,6 +9,16 @@ from runner_core.preprocess.transforms import apply_preprocess
 from runner_core.views.builders import build_source_views
 
 
+def _load_inline_source(src: dict) -> pd.DataFrame:
+    rows = src.get("rows", [])
+    if not isinstance(rows, list) or not rows:
+        raise RuntimeError("inline source requires non-empty rows")
+    frame = pd.DataFrame(rows)
+    if frame.empty:
+        raise RuntimeError("inline source produced empty dataframe")
+    return frame
+
+
 def run_kosis_sources_job(job: dict) -> Tuple[Any, Any, str]:
     sources = job.get("sources", [])
     if not isinstance(sources, list) or not sources:
@@ -22,7 +32,11 @@ def run_kosis_sources_job(job: dict) -> Tuple[Any, Any, str]:
         src_name = str(src.get("name", "")).strip()
         if not src_name:
             raise RuntimeError("Each source needs a non-empty name")
-        d = fetch_kosis_df(src, api_key)
+        source_type = str(src.get("source_type", "kosis")).strip().lower()
+        if source_type == "inline":
+            d = _load_inline_source(src)
+        else:
+            d = fetch_kosis_df(src, api_key)
         d["SOURCE_NAME"] = src_name
         d = apply_row_filters(d, src.get("filters", {}))
         if isinstance(src.get("preprocess"), dict):

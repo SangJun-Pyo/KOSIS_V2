@@ -1,28 +1,181 @@
 {
-  "job_name": "1-07_장래인구추계_시군구별_인구구조부양비_최근21년",
-  "provider": "kosis",
-  "orgId": "101",
-  "tblId": "INH_PB0003_2022_23",
-  "prdSe": "Y",
-  "newEstPrdCnt": 21,
-  "itmId": "T10",
-  "objL1": "ALL",
-  "objL2": "ALL",
+  "job_name": "1-07_장래인구추계_인구구조부양비_주요지표",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "population_projection",
+      "orgId": "101",
+      "tblId": "INH_PB0003_2022_23",
+      "prdSe": "Y",
+      "newEstPrdCnt": 21,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T10",
+      "objL1": "ALL",
+      "objL2": "ALL"
+    }
+  ],
+  "raw_sheets": [
+    {
+      "source": "population_projection",
+      "sheet_name": "RAW_DATA",
+      "filters": {
+        "C1_NM": [
+          "인천"
+        ],
+        "PRD_DE": [
+          "2025",
+          "2030",
+          "2035",
+          "2040"
+        ]
+      },
+      "columns": [
+        "C1",
+        "C1_NM",
+        "C2",
+        "C2_NM",
+        "PRD_DE",
+        "DT",
+        "UNIT_NM"
+      ]
+    }
+  ],
   "output_subdir": "population/common",
-  "output_prefix": "1-07_장래인구추계_시군구별_인구구조부양비_최근21년",
-  "pivot": {
-    "index": [
-      "C1_NM",
-      "C2_NM"
-    ],
-    "columns": [
-      "PRD_DE"
-    ],
-    "values": "DT",
-    "sheet_name": "TABLE_VIEW",
-    "flatten_columns_year": false,
-    "sort": false
-  },
+  "output_prefix": "1-07_장래인구추계_인구구조부양비_주요지표",
+  "views": [
+    {
+      "source": "population_projection",
+      "kind": "row_timeseries",
+      "sheet_name": "RAW_VIEW",
+      "filters": {
+        "C1_NM": [
+          "인천"
+        ],
+        "PRD_DE": [
+          "__LATEST_11_YEARS__"
+        ]
+      },
+      "row_key_col": "C2_NM",
+      "row_label_col": "C2_NM",
+      "group_label": "시군구별",
+      "group_value": "인천",
+      "item_label": "인구구조, 부양비별",
+      "years": [
+        "__LATEST_11_YEARS__"
+      ],
+      "row_order": [
+        "총인구(명)",
+        "남자(명)",
+        "여자(명)",
+        "성비(여자1백명당)",
+        "인구성장률(%)",
+        "총부양비",
+        "유소년부양비",
+        "노년부양비",
+        "노령화지수",
+        "중위연령(세)",
+        "중위연령(세)-남자",
+        "중위연령(세)-여자"
+      ],
+      "year_label_map": {},
+      "value_round": 1
+    },
+    {
+      "source": "population_projection",
+      "kind": "dual_label_timeseries_summary",
+      "sheet_name": "TABLE_VIEW",
+      "filters": {
+        "C1_NM": [
+          "인천"
+        ],
+        "PRD_DE": [
+          "2025",
+          "2030",
+          "2035",
+          "2040"
+        ]
+      },
+      "row_key_col": "C2_NM",
+      "years": [
+        "2025",
+        "2030",
+        "2035",
+        "2040"
+      ],
+      "include_share": false,
+      "cagr_label": "__AUTO_CAGR_LABEL__",
+      "annual_change_label": "연평균변화량('25~'40)",
+      "annual_change_include_keys": [
+        "인구성장률(%)"
+      ],
+      "cagr_exclude_keys": [
+        "인구성장률(%)"
+      ],
+      "group_label": "구분",
+      "detail_label": "세부",
+      "value_round": 1,
+      "entries": [
+        {
+          "key": "총인구(명)",
+          "group": "총 인구",
+          "detail": ""
+        },
+        {
+          "key": "남자(명)",
+          "group": "성별",
+          "detail": "남성"
+        },
+        {
+          "key": "여자(명)",
+          "group": "",
+          "detail": "여성"
+        },
+        {
+          "key": "성비(여자1백명당)",
+          "group": "",
+          "detail": "성비"
+        },
+        {
+          "key": "인구성장률(%)",
+          "group": "인구성장률",
+          "detail": ""
+        },
+        {
+          "key": "총부양비",
+          "group": "부양비",
+          "detail": "총부양비"
+        },
+        {
+          "key": "유소년부양비",
+          "group": "",
+          "detail": "유소년부양비"
+        },
+        {
+          "key": "노년부양비",
+          "group": "",
+          "detail": "노년부양비"
+        },
+        {
+          "key": "노령화지수",
+          "group": "노령화지수",
+          "detail": ""
+        }
+      ],
+      "value_round_map": {
+        "총인구(명)": 0,
+        "남자(명)": 0,
+        "여자(명)": 0,
+        "성비(여자1백명당)": 1,
+        "인구성장률(%)": 2,
+        "총부양비": 1,
+        "유소년부양비": 1,
+        "노년부양비": 1,
+        "노령화지수": 1
+      }
+    }
+  ],
   "scope_all_regions": true,
   "scope_type": "common",
   "scope_regions": []

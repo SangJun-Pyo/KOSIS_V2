@@ -1,40 +1,138 @@
 {
-  "job_name": "1-04_주민등록인구_시도별_성별_2015_2025",
-  "provider": "kosis",
-  "orgId": "101",
-  "tblId": "DT_1B04005N",
-  "prdSe": "Y",
-  "newEstPrdCnt": 5,
-  "itmId": "T2 T3 T4",
-  "objL1": "00 11 26 27 28 29 30 31 36 41 51 43 44 52 46 47 48 50",
-  "objL2": "ALL",
-  "output_subdir": "population/common",
-  "output_prefix": "1-04_인구_시도별_성별_2015_2025",
-  "pivot": {
-    "index": [
-      "C1_NM"
-    ],
-    "columns": [
-      "PRD_DE",
-      "ITM_NM"
-    ],
-    "values": "DT",
-    "filters": {
-      "PRD_DE": [
-        "2021",
-        "2022",
-        "2023",
-        "2024",
-        "2025"
-      ]
+  "job_name": "1-04_인구_시도별_성별_최근5년",
+  "provider": "kosis_multi",
+  "sources": [
+    {
+      "name": "population_gender",
+      "orgId": "101",
+      "tblId": "DT_1B04005N",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "itmId": "T2 T3 T4",
+      "objL1": "28",
+      "objL2": "ALL",
+      "format": "json",
+      "jsonVD": "Y",
+      "filters": {
+        "C2": [
+          "0"
+        ],
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      }
+    }
+  ],
+  "merge_keys": [
+    "C1",
+    "C1_NM",
+    "PRD_DE"
+  ],
+  "metrics": [
+    {
+      "id": "total_population",
+      "label": "총 인구",
+      "source": "population_gender",
+      "source_filter": {
+        "ITM_ID": "T2"
+      },
+      "agg": "first"
     },
-    "sheet_name": "TABLE_VIEW",
-    "flatten_columns_year": false
-  },
+    {
+      "id": "male_population",
+      "label": "남성 인구",
+      "source": "population_gender",
+      "source_filter": {
+        "ITM_ID": "T3"
+      },
+      "agg": "first"
+    },
+    {
+      "id": "female_population",
+      "label": "여성 인구",
+      "source": "population_gender",
+      "source_filter": {
+        "ITM_ID": "T4"
+      },
+      "agg": "first"
+    },
+    {
+      "id": "sex_ratio",
+      "label": "성비",
+      "formula": "male_population / female_population * 100",
+      "round": 1
+    }
+  ],
+  "raw_sheets": [
+    {
+      "sheet_name": "RAW_DATA",
+      "source": "population_gender",
+      "columns": [
+        "C1",
+        "C1_NM",
+        "C2",
+        "C2_NM",
+        "PRD_DE",
+        "ITM_ID",
+        "ITM_NM",
+        "DT",
+        "UNIT_NM"
+      ]
+    }
+  ],
+  "output_subdir": "population/common",
+  "output_prefix": "1-04_인구_시도별_성별_최근5년",
+  "views": [
+    {
+      "source": "population_gender",
+      "kind": "pivot",
+      "sheet_name": "RAW_VIEW",
+      "filters": {
+        "C2": [
+          "0"
+        ],
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      },
+      "index": [
+        "C1_NM",
+        "ITM_NM"
+      ],
+      "columns": [
+        "PRD_DE"
+      ],
+      "values": "DT",
+      "sort": false
+    },
+    {
+      "source": "metrics",
+      "kind": "category_timeseries_summary",
+      "sheet_name": "TABLE_VIEW",
+      "category_col": "METRIC",
+      "years": [
+        "__LATEST_5_YEARS__"
+      ],
+      "category_order": [
+        "총 인구",
+        "남성 인구",
+        "여성 인구",
+        "성비"
+      ],
+      "row_label": "항목",
+      "value_round_map": {
+        "총 인구": 0,
+        "남성 인구": 0,
+        "여성 인구": 0,
+        "성비": 1
+      },
+      "cagr_label": "__AUTO_CAGR_LABEL__",
+      "cagr_exclude_keys": [
+        "성비"
+      ]
+    }
+  ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": [],
-  "maintenance_review_20260513": [
-    "????? 2015/2025 ???? ?? 5?? ?? ?? ???? ??"
-  ]
+  "scope_regions": []
 }

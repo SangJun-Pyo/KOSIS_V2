@@ -38,11 +38,7 @@
           "C08"
         ],
         "PRD_DE": [
-          "2021",
-          "2022",
-          "2023",
-          "2024",
-          "2025"
+          "__LATEST_5_YEARS__"
         ]
       },
       "index": [
@@ -90,11 +86,7 @@
           "C0602"
         ],
         "PRD_DE": [
-          "2021",
-          "2022",
-          "2023",
-          "2024",
-          "2025"
+          "__LATEST_5_YEARS__"
         ]
       },
       "index": [
@@ -135,11 +127,7 @@
           "B0539"
         ],
         "PRD_DE": [
-          "2021",
-          "2022",
-          "2023",
-          "2024",
-          "2025"
+          "__LATEST_5_YEARS__"
         ]
       },
       "region_col": "C2_NM",
@@ -167,11 +155,7 @@
         "제주특별자치도"
       ],
       "years": [
-        "2021",
-        "2022",
-        "2023",
-        "2024",
-        "2025"
+        "__LATEST_5_YEARS__"
       ],
       "rank_metric": {
         "label": "부채 (만원)",
@@ -180,9 +164,9 @@
             "C06"
           ]
         },
-        "rank_year": "2025",
+        "rank_year": "__LATEST_YEAR__",
         "rank_label": "순위",
-        "cagr_label": "CAGR('21~'25)"
+        "cagr_label": "__AUTO_CAGR_LABEL__"
       },
       "metric_blocks": [
         {
@@ -192,7 +176,7 @@
               "C0601"
             ]
           },
-          "cagr_label": "CAGR('21~'25)"
+          "cagr_label": "__AUTO_CAGR_LABEL__"
         },
         {
           "label": "임대보증금 (만원)",
@@ -201,7 +185,7 @@
               "C0602"
             ]
           },
-          "cagr_label": "CAGR('21~'25)"
+          "cagr_label": "__AUTO_CAGR_LABEL__"
         }
       ]
     }

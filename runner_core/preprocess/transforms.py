@@ -3,61 +3,49 @@ from decimal import Decimal, ROUND_HALF_UP
 from typing import Any, Dict, Optional
 
 import pandas as pd
+from runner_core.periods import period_sort_key
 
 
 def map_age_to_10y_bucket(label: Any) -> Optional[str]:
     s = str(label).strip()
     if not s:
         return None
-    if s in ("??", "??", "?"):
-        return "??"
+    if s in ("계", "전체", "총계"):
+        return "계"
 
     nums = [int(x) for x in re.findall(r"\d+", s)]
-    if "??" in s:
+    if "세" in s:
         if nums and nums[0] <= 9:
-            return "9???"
-    if "??" in s or "+" in s:
+            return "9세 이하"
+    if "세" in s or "+" in s:
         if nums and nums[0] >= 100:
-            return "100???"
+            return "100세 이상"
         if nums:
             start = (nums[0] // 10) * 10
             if start == 0:
-                return "9???"
+                return "9세 이하"
             if start >= 100:
-                return "100???"
-            return f"{start}-{start+9}?"
+                return "100세 이상"
+            return f"{start}-{start+9}세"
 
     if len(nums) >= 2:
         start = (nums[0] // 10) * 10
         if start == 0:
-            return "9???"
+            return "9세 이하"
         if start >= 100:
-            return "100???"
-        return f"{start}-{start+9}?"
+            return "100세 이상"
+        return f"{start}-{start+9}세"
 
     if len(nums) == 1:
         n = nums[0]
         if n <= 9:
-            return "9???"
+            return "9세 이하"
         if n >= 100:
-            return "100???"
+            return "100세 이상"
         start = (n // 10) * 10
-        return f"{start}-{start+9}?"
+        return f"{start}-{start+9}세"
 
     return None
-
-
-def _period_sort_key(value: Any) -> tuple:
-    text = str(value).strip()
-    if re.fullmatch(r"\d{4}", text):
-        return (0, int(text), 0, 0)
-    if re.fullmatch(r"\d{6}", text):
-        return (1, int(text[:4]), int(text[4:6]), 0)
-    match = re.fullmatch(r"(\d{4})\.(\d)/4", text)
-    if match:
-        return (2, int(match.group(1)), int(match.group(2)), 0)
-    return (9, text, 0, 0)
-
 
 def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
     cfg = job.get("preprocess", {})
@@ -121,26 +109,37 @@ def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
         d[src] = d[src].map(map_age_to_10y_bucket)
         if age_cfg.get("drop_unknown", True):
             d = d[d[src].notna()].copy()
+        code_col = age_cfg.get("code_col")
+        if not code_col and src.endswith("_NM"):
+            candidate = src[:-3]
+            if candidate in d.columns:
+                code_col = candidate
+        if code_col and code_col in d.columns:
+            d[code_col] = d[src]
 
         order = [
-            "??",
-            "9???",
-            "10-19?",
-            "20-29?",
-            "30-39?",
-            "40-49?",
-            "50-59?",
-            "60-69?",
-            "70-79?",
-            "80-89?",
-            "90-99?",
-            "100???",
+            "계",
+            "9세 이하",
+            "10-19세",
+            "20-29세",
+            "30-39세",
+            "40-49세",
+            "50-59세",
+            "60-69세",
+            "70-79세",
+            "80-89세",
+            "90-99세",
+            "100세 이상",
         ]
         d[src] = pd.Categorical(d[src], categories=order, ordered=True)
 
         if "DT" in d.columns:
             d["DT"] = pd.to_numeric(d["DT"], errors="coerce").fillna(0)
-            group_cols = [c for c in d.columns if c != "DT"]
+            configured_group_cols = age_cfg.get("group_cols")
+            if isinstance(configured_group_cols, list) and configured_group_cols:
+                group_cols = [str(c) for c in configured_group_cols if str(c) in d.columns]
+            else:
+                group_cols = [c for c in d.columns if c != "DT"]
             d = d.groupby(group_cols, as_index=False, dropna=False, sort=False, observed=True)["DT"].sum()
             d[src] = pd.Categorical(d[src], categories=order, ordered=True)
 
@@ -218,7 +217,7 @@ def apply_preprocess(df: pd.DataFrame, job: dict) -> pd.DataFrame:
         if src not in d.columns:
             raise RuntimeError(f"preprocess source column missing: {src}")
         last_n = int(latest_periods_cfg.get("last_n", 5))
-        unique_periods = sorted({str(v).strip() for v in d[src].dropna().astype(str)}, key=_period_sort_key)
+        unique_periods = sorted({str(v).strip() for v in d[src].dropna().astype(str)}, key=period_sort_key)
         keep = set(unique_periods[-last_n:]) if last_n > 0 else set(unique_periods)
         d = d[d[src].astype(str).isin(keep)].copy()
 

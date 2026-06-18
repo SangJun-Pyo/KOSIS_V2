@@ -9,6 +9,8 @@
       "tblId": "DT_1YL20121",
       "prdSe": "Y",
       "newEstPrdCnt": 5,
+      "startPrdDe": "2020",
+      "endPrdDe": "2024",
       "format": "json",
       "jsonVD": "Y",
       "itmId": "T10 T20 T30 T40",
@@ -63,6 +65,8 @@
         "2023": "2023년",
         "2024": "2024년"
       },
+      "include_cagr": true,
+      "cagr_label": "CAGR",
       "value_round_map": {
         "T10": 0,
         "T20": 0,

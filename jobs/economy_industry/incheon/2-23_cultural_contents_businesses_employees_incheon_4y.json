@@ -193,6 +193,8 @@
             "2022": "2022년",
             "2023": "2023년"
           },
+          "include_cagr": true,
+          "cagr_label": "CAGR",
           "value_round": 0,
           "repeat_group_label": false,
           "blank_rows": 0
@@ -230,6 +232,8 @@
             "2022": "2022년",
             "2023": "2023년"
           },
+          "include_cagr": true,
+          "cagr_label": "CAGR",
           "value_round": 0,
           "repeat_group_label": false,
           "blank_rows": 0
@@ -267,6 +271,7 @@
             "2022": "2022년",
             "2023": "2023년"
           },
+          "include_cagr": false,
           "value_round": 1,
           "repeat_group_label": false,
           "blank_rows": 0
@@ -310,6 +315,11 @@
             "2022": "2022년",
             "2023": "2023년"
           },
+          "include_cagr": true,
+          "cagr_label": "CAGR",
+          "cagr_exclude_keys": [
+            "전국대비 비중"
+          ],
           "value_round": 0,
           "value_round_map": {
             "전국대비 비중": 1

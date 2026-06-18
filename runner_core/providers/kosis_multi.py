@@ -4,6 +4,7 @@ import pandas as pd
 
 from runner_core.api.kosis_client import fetch_kosis_df
 from runner_core.api_key_store import get_kosis_api_key
+from runner_core.preprocess.filters import apply_row_filters
 from runner_core.preprocess.transforms import apply_preprocess
 from runner_core.views.builders import build_source_views, build_table_views
 
@@ -31,10 +32,7 @@ def run_kosis_multi_job(job: dict) -> Tuple[Any, Any, str]:
         df = fetch_kosis_df(src, get_kosis_api_key())
         source_filters = src.get("filters", {})
         if isinstance(source_filters, dict):
-            for col, val in source_filters.items():
-                if col in df.columns:
-                    vals = val if isinstance(val, list) else [val]
-                    df = df[df[col].astype(str).isin([str(v) for v in vals])]
+            df = apply_row_filters(df, source_filters)
         if isinstance(src.get("preprocess"), dict):
             df = apply_preprocess(df, {"preprocess": src["preprocess"]})
         need = [c for c in merge_keys if c not in df.columns]
@@ -143,10 +141,7 @@ def run_kosis_multi_job(job: dict) -> Tuple[Any, Any, str]:
 
             flt = spec.get("filters", {})
             if isinstance(flt, dict):
-                for col, val in flt.items():
-                    if col in d.columns:
-                        vals = val if isinstance(val, list) else [val]
-                        d = d[d[col].astype(str).isin([str(v) for v in vals])]
+                d = apply_row_filters(d, flt)
 
             cols = spec.get("columns")
             if isinstance(cols, list) and cols:

@@ -1,5 +1,5 @@
 {
-  "job_name": "2-19_농가인구_광역비교_최근4년",
+  "job_name": "2-19_농가인구_광역비교_최근5년",
   "provider": "kosis_sources",
   "include_source_raw": true,
   "sources": [
@@ -18,13 +18,14 @@
           "2020",
           "2021",
           "2022",
-          "2023"
+          "2023",
+          "2024"
         ]
       }
     }
   ],
   "output_subdir": "economy_industry/common",
-  "output_prefix": "2-19_농가인구_광역비교_최근4년",
+  "output_prefix": "2-19_농가인구_광역비교_최근5년",
   "views": [
     {
       "source": "farm_population",
@@ -36,12 +37,14 @@
         "2020",
         "2021",
         "2022",
-        "2023"
+        "2023",
+        "2024"
       ],
       "national_name": "전국",
       "national_alias": "전국",
-      "include_share": false,
-      "include_cagr": false,
+      "include_share": true,
+      "include_cagr": true,
+      "cagr_label": "CAGR",
       "value_round": 0,
       "region_order": [
         "전국",

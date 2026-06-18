@@ -19,17 +19,21 @@ from runner_core.pivots.summary import (
     make_category_timeseries_summary_pivot,
     make_dual_label_latest_compare_pivot,
     make_dual_label_timeseries_summary_pivot,
+    make_gender_age_compare_summary_pivot,
     make_group_metric_share_summary_pivot,
     make_hierarchy_timeseries_summary_pivot,
     make_latest_metric_matrix_pivot,
     make_latest_metric_share_summary_pivot,
     make_metric_block_summary_pivot,
     make_metric_summary_pivot,
+    make_multi_metric_region_compare_pivot,
     make_paired_metric_latest_compare_pivot,
     make_paired_metric_timeseries_summary_pivot,
+    make_population_pyramid_compare_pivot,
     make_region_year_metric_matrix_pivot,
     make_row_timeseries_pivot,
     make_single_metric_share_summary_pivot,
+    make_single_metric_year_share_summary_pivot,
 )
 from runner_core.preprocess.filters import apply_row_filters, apply_value_maps
 from runner_core.preprocess.transforms import apply_preprocess, flatten_for_block, substitute_template
@@ -47,6 +51,12 @@ def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
             share_base_df = df.copy()
             share_base_df = apply_value_maps(share_base_df, spec)
         return make_single_metric_share_summary_pivot(d, spec, share_base_df=share_base_df)
+    if kind == "single_metric_year_share_summary":
+        d = apply_row_filters(df, spec.get("filters", {}))
+        if isinstance(spec.get("preprocess"), dict):
+            d = apply_preprocess(d, {"preprocess": spec["preprocess"]})
+        d = apply_value_maps(d, spec)
+        return make_single_metric_year_share_summary_pivot(d, spec)
 
     d = apply_row_filters(df, spec.get("filters", {}))
     if isinstance(spec.get("preprocess"), dict):
@@ -92,6 +102,8 @@ def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
         return make_paired_metric_timeseries_summary_pivot(d, spec)
     if kind == "paired_metric_latest_compare":
         return make_paired_metric_latest_compare_pivot(d, spec)
+    if kind == "multi_metric_region_compare":
+        return make_multi_metric_region_compare_pivot(d, spec)
     if kind == "rank_and_metric_block_summary":
         return make_rank_and_metric_block_summary_pivot(d, spec)
     if kind == "age_distribution_summary":
@@ -110,6 +122,10 @@ def build_single_source_view(df: pd.DataFrame, spec: dict) -> pd.DataFrame:
         return make_dual_label_latest_compare_pivot(d, spec)
     if kind == "dual_label_timeseries_summary":
         return make_dual_label_timeseries_summary_pivot(d, spec)
+    if kind == "gender_age_compare_summary":
+        return make_gender_age_compare_summary_pivot(d, spec)
+    if kind == "population_pyramid_compare":
+        return make_population_pyramid_compare_pivot(d, spec)
     if kind == "region_year_metric_matrix":
         return make_region_year_metric_matrix_pivot(d, spec)
     raise RuntimeError(f"unknown view kind: {kind}")
@@ -134,7 +150,12 @@ def make_stack_blocks_view(source_frames: Dict[str, pd.DataFrame], spec: dict) -
         title = str(block.get("title", "")).strip()
         if title:
             first_col = block_df.columns[0] if len(block_df.columns) else "구분"
-            rendered.append(pd.DataFrame([{first_col: title}]))
+            if len(block_df.columns):
+                title_df = pd.DataFrame([[pd.NA] * len(block_df.columns)], columns=block_df.columns)
+                title_df.iat[0, 0] = title
+                rendered.append(title_df)
+            else:
+                rendered.append(pd.DataFrame([{first_col: title}]))
 
         rendered.append(block_df)
 

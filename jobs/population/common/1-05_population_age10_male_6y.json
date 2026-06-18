@@ -1,39 +1,241 @@
 {
-  "job_name": "1-05_주민등록인구_시도_10세별_남자인구_최근6년",
-  "provider": "kosis",
-  "orgId": "101",
-  "tblId": "DT_1B04005N",
-  "prdSe": "Y",
-  "newEstPrdCnt": 6,
-  "itmId": "T3",
-  "objL1": "00 11 26 27 28 29 30 31 36 41 51 43 44 52 46 47 48 50",
-  "objL2": "ALL",
-  "output_subdir": "population/common",
-  "output_prefix": "1-05_인구_시도_10세별_남자인구_최근6년",
-  "preprocess": {
-    "age_bucket_10y": {
-      "source": "C2_NM",
-      "drop_unknown": true
+  "job_name": "1-05_인구_시도_10세별_남자인구_최근5년",
+  "provider": "kosis_sources",
+  "include_source_raw": true,
+  "sources": [
+    {
+      "name": "male_population_age_raw",
+      "orgId": "101",
+      "tblId": "DT_1B04005N",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T3",
+      "objL1": "28",
+      "objL2": "ALL",
+      "filters": {
+        "C1": [
+          "28"
+        ],
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      }
+    },
+    {
+      "name": "male_population_age_10y",
+      "orgId": "101",
+      "tblId": "DT_1B04005N",
+      "prdSe": "Y",
+      "newEstPrdCnt": 5,
+      "format": "json",
+      "jsonVD": "Y",
+      "itmId": "T3",
+      "objL1": "28",
+      "objL2": "ALL",
+      "filters": {
+        "C1": [
+          "28"
+        ],
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      },
+      "preprocess": {
+        "age_bucket_10y": {
+          "source": "C2_NM",
+          "group_cols": [
+            "C1",
+            "C1_NM",
+            "PRD_DE",
+            "ITM_ID",
+            "ITM_NM",
+            "UNIT_NM",
+            "C2_NM"
+          ],
+          "drop_unknown": true
+        }
+      }
     }
-  },
-  "pivot": {
-    "index": [
-      "C1_NM",
-      "C2_NM"
-    ],
-    "columns": [
-      "PRD_DE"
-    ],
-    "values": "DT",
-    "sheet_name": "TABLE_VIEW",
-    "flatten_columns_year": false,
-    "sort": false
-  },
+  ],
+  "raw_sheets": [
+    {
+      "source": "male_population_age_raw",
+      "sheet_name": "RAW_DATA",
+      "columns": [
+        "C1",
+        "C1_NM",
+        "C2_NM",
+        "PRD_DE",
+        "ITM_ID",
+        "ITM_NM",
+        "DT",
+        "UNIT_NM"
+      ]
+    }
+  ],
+  "output_subdir": "population/common",
+  "output_prefix": "1-05_인구_시도_10세별_남자인구_최근5년",
+  "views": [
+    {
+      "source": "male_population_age_raw",
+      "kind": "row_timeseries",
+      "sheet_name": "RAW_VIEW",
+      "filters": {
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      },
+      "row_key_col": "C2_NM",
+      "row_label_col": "C2_NM",
+      "group_label": "행정구역(동읍면)별",
+      "group_value": "인천광역시",
+      "item_label": "5세별",
+      "years": [
+        "__LATEST_5_YEARS__"
+      ],
+      "row_order": [
+        "계",
+        "0 - 4세",
+        "5 - 9세",
+        "10 - 14세",
+        "15 - 19세",
+        "20 - 24세",
+        "25 - 29세",
+        "30 - 34세",
+        "35 - 39세",
+        "40 - 44세",
+        "45 - 49세",
+        "50 - 54세",
+        "55 - 59세",
+        "60 - 64세",
+        "65 - 69세",
+        "70 - 74세",
+        "75 - 79세",
+        "80 - 84세",
+        "85 - 89세",
+        "90 - 94세",
+        "95 - 99세",
+        "100+"
+      ],
+      "year_label_map": {},
+      "value_round": 0
+    },
+    {
+      "source": "male_population_age_10y",
+      "kind": "age_distribution_summary",
+      "sheet_name": "TABLE_VIEW",
+      "years": [
+        "__LATEST_5_YEARS__"
+      ],
+      "age_col": "C2_NM",
+      "age_code_col": "C2_NM",
+      "detail_filters": {
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      },
+      "detail_order": [
+        "계",
+        "9세 이하",
+        "10-19세",
+        "20-29세",
+        "30-39세",
+        "40-49세",
+        "50-59세",
+        "60-69세",
+        "70-79세",
+        "80-89세",
+        "90-99세",
+        "100세 이상"
+      ],
+      "summary_filters": {
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      },
+      "total_codes": [
+        "계"
+      ],
+      "total_label": "계",
+      "share_year": "__LATEST_YEAR__",
+      "cagr_label": "__AUTO_CAGR_LABEL__",
+      "left_label": "구분",
+      "summary_label": "구분",
+      "value_label": "인구수",
+      "share_label": "비중",
+      "bucket_defs": [
+        {
+          "label": "9세 이하",
+          "codes": [
+            "9세 이하"
+          ]
+        },
+        {
+          "label": "10-19세",
+          "codes": [
+            "10-19세"
+          ]
+        },
+        {
+          "label": "20-29세",
+          "codes": [
+            "20-29세"
+          ]
+        },
+        {
+          "label": "30-39세",
+          "codes": [
+            "30-39세"
+          ]
+        },
+        {
+          "label": "40-49세",
+          "codes": [
+            "40-49세"
+          ]
+        },
+        {
+          "label": "50-59세",
+          "codes": [
+            "50-59세"
+          ]
+        },
+        {
+          "label": "60-69세",
+          "codes": [
+            "60-69세"
+          ]
+        },
+        {
+          "label": "70-79세",
+          "codes": [
+            "70-79세"
+          ]
+        },
+        {
+          "label": "80-89세",
+          "codes": [
+            "80-89세"
+          ]
+        },
+        {
+          "label": "90-99세",
+          "codes": [
+            "90-99세"
+          ]
+        },
+        {
+          "label": "100세 이상",
+          "codes": [
+            "100세 이상"
+          ]
+        }
+      ]
+    }
+  ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": [],
-  "maintenance_review_20260513": [
-    "10? ?? ?? ?? ?? ?? ??",
-    "?? JSON? ?? 5? ?? ???? 10? ??? ???? ?? ??"
-  ]
+  "scope_regions": []
 }

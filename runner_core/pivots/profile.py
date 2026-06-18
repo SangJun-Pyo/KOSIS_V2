@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 
 from runner_core.preprocess.filters import apply_row_filters
+from runner_core.periods import available_periods, resolve_cagr_label, resolve_period_list, resolve_period_value, period_template
 
 
 def make_year_gender_mix_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
@@ -17,8 +18,9 @@ def make_year_gender_mix_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFram
     if index_col not in df.columns or sex_col not in df.columns or region_col not in df.columns:
         raise RuntimeError("year gender mix required columns missing")
 
-    years = [str(y) for y in pivot_cfg.get("years", [])]
-    detail_year = str(pivot_cfg.get("detail_year", years[-1] if years else ""))
+    available = available_periods(df["PRD_DE"].astype(str).tolist())
+    years = resolve_period_list([str(y) for y in pivot_cfg.get("years", [])], available)
+    detail_year = resolve_period_value(pivot_cfg.get("detail_year", years[-1] if years else ""), available)
     total_label = str(pivot_cfg.get("total_label", "계"))
     detail_labels = [str(x) for x in pivot_cfg.get("detail_labels", ["남자", "여자"])]
     item_order = [str(x) for x in pivot_cfg.get("item_order", [])]
@@ -61,7 +63,8 @@ def make_latest_profile_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.D
     if missing:
         raise RuntimeError(f"latest profile summary columns missing: {missing}")
 
-    year = str(pivot_cfg.get("year", "")).strip()
+    available = available_periods(df["PRD_DE"].astype(str).tolist())
+    year = resolve_period_value(pivot_cfg.get("year", ""), available).strip()
     if not year:
         raise RuntimeError("latest profile summary requires year")
 
@@ -107,7 +110,8 @@ def make_timeseries_profile_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> 
     if missing:
         raise RuntimeError(f"timeseries profile summary columns missing: {missing}")
 
-    years = [str(y) for y in pivot_cfg.get("years", [])]
+    available = available_periods(df["PRD_DE"].astype(str).tolist())
+    years = resolve_period_list([str(y) for y in pivot_cfg.get("years", [])], available)
     if not years:
         raise RuntimeError("timeseries profile summary requires years")
 
@@ -116,7 +120,7 @@ def make_timeseries_profile_summary_pivot(df: pd.DataFrame, pivot_cfg: dict) -> 
     male_label = str(pivot_cfg.get("male_label", "남자"))
     female_label = str(pivot_cfg.get("female_label", "여자"))
     item_order = [str(x) for x in pivot_cfg.get("item_order", [])]
-    cagr_label = str(pivot_cfg.get("cagr_label", f"CAGR('{years[0][2:]}~'{years[-1][2:]})"))
+    cagr_label = resolve_cagr_label(pivot_cfg.get("cagr_label"), years)
     periods = max(int(years[-1]) - int(years[0]), 1)
 
     d = df.copy()

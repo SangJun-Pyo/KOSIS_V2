@@ -1,5 +1,5 @@
 {
-  "job_name": "1-10_유아천명당_보육시설수_광역비교_최근3년",
+  "job_name": "1-11_유아천명당_보육시설수_광역비교",
   "provider": "kosis",
   "orgId": "101",
   "tblId": "DT_1YL20951",
@@ -10,7 +10,7 @@
   "itmId": "T10 T001 T002",
   "objL1": "00 11 21 22 23 24 25 26 29 31 32 33 34 35 36 37 38 39",
   "output_subdir": "population/common",
-  "output_prefix": "1-10_유아천명당_보육시설수_광역비교_최근3년",
+  "output_prefix": "1-11_유아천명당_보육시설수_광역비교",
   "pivot": {
     "index": [
       "C1_NM"
@@ -21,7 +21,7 @@
     "values": "DT",
     "filters": {
       "PRD_DE": [
-        "2024"
+        "__LATEST_1_YEARS__"
       ],
       "ITM_ID": [
         "T10",
@@ -42,7 +42,7 @@
     {
       "kind": "latest_rank",
       "sheet_name": "SUMMARY_VIEW",
-      "year": "2024",
+      "year": "__LATEST_YEAR__",
       "item_ids": [
         "T001",
         "T002",
@@ -67,6 +67,6 @@
     "?? ?? ?? ?? ??",
     "2025 ???? ??? ?? ??? ??? ?? ? ?? ??"
   ],
-  "serial_no": "1-10",
-  "paired_with": "1-11"
+  "serial_no": "1-11",
+  "paired_with": "1-10"
 }

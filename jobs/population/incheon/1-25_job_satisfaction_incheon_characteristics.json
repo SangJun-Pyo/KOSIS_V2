@@ -7,6 +7,13 @@
       "name": "job_itself",
       "orgId": "204",
       "tblId": "DT_204010_2025A069",
+      "tblId_template": "DT_204010_{year}A069",
+      "tblId_year_fallbacks": [
+        0,
+        -1,
+        -2,
+        -3
+      ],
       "prdSe": "Y",
       "newEstPrdCnt": 1,
       "format": "json",
@@ -19,6 +26,13 @@
       "name": "job_income",
       "orgId": "204",
       "tblId": "DT_204010_2025A070",
+      "tblId_template": "DT_204010_{year}A070",
+      "tblId_year_fallbacks": [
+        0,
+        -1,
+        -2,
+        -3
+      ],
       "prdSe": "Y",
       "newEstPrdCnt": 1,
       "format": "json",
@@ -31,6 +45,13 @@
       "name": "job_hours",
       "orgId": "204",
       "tblId": "DT_204010_2025A071",
+      "tblId_template": "DT_204010_{year}A071",
+      "tblId_year_fallbacks": [
+        0,
+        -1,
+        -2,
+        -3
+      ],
       "prdSe": "Y",
       "newEstPrdCnt": 1,
       "format": "json",
@@ -43,6 +64,13 @@
       "name": "job_environment",
       "orgId": "204",
       "tblId": "DT_204010_2025A072",
+      "tblId_template": "DT_204010_{year}A072",
+      "tblId_year_fallbacks": [
+        0,
+        -1,
+        -2,
+        -3
+      ],
       "prdSe": "Y",
       "newEstPrdCnt": 1,
       "format": "json",
@@ -55,6 +83,13 @@
       "name": "job_overall",
       "orgId": "204",
       "tblId": "DT_204010_2025A073",
+      "tblId_template": "DT_204010_{year}A073",
+      "tblId_year_fallbacks": [
+        0,
+        -1,
+        -2,
+        -3
+      ],
       "prdSe": "Y",
       "newEstPrdCnt": 1,
       "format": "json",
@@ -62,6 +97,83 @@
       "itmId": "T001",
       "objL1": "ALL",
       "objL2": "ALL"
+    }
+  ],
+  "raw_sheets": [
+    {
+      "source": "job_itself",
+      "sheet_name": "RAW_JOB_ITSELF",
+      "columns": [
+        "C1",
+        "C1_NM",
+        "C2",
+        "C2_NM",
+        "ITM_ID",
+        "ITM_NM",
+        "PRD_DE",
+        "DT",
+        "UNIT_NM"
+      ]
+    },
+    {
+      "source": "job_income",
+      "sheet_name": "RAW_JOB_INCOME",
+      "columns": [
+        "C1",
+        "C1_NM",
+        "C2",
+        "C2_NM",
+        "ITM_ID",
+        "ITM_NM",
+        "PRD_DE",
+        "DT",
+        "UNIT_NM"
+      ]
+    },
+    {
+      "source": "job_hours",
+      "sheet_name": "RAW_JOB_HOURS",
+      "columns": [
+        "C1",
+        "C1_NM",
+        "C2",
+        "C2_NM",
+        "ITM_ID",
+        "ITM_NM",
+        "PRD_DE",
+        "DT",
+        "UNIT_NM"
+      ]
+    },
+    {
+      "source": "job_environment",
+      "sheet_name": "RAW_JOB_ENVIRONMENT",
+      "columns": [
+        "C1",
+        "C1_NM",
+        "C2",
+        "C2_NM",
+        "ITM_ID",
+        "ITM_NM",
+        "PRD_DE",
+        "DT",
+        "UNIT_NM"
+      ]
+    },
+    {
+      "source": "job_overall",
+      "sheet_name": "RAW_JOB_OVERALL",
+      "columns": [
+        "C1",
+        "C1_NM",
+        "C2",
+        "C2_NM",
+        "ITM_ID",
+        "ITM_NM",
+        "PRD_DE",
+        "DT",
+        "UNIT_NM"
+      ]
     }
   ],
   "output_subdir": "population/incheon",
@@ -77,7 +189,7 @@
         "job_overall"
       ],
       "sheet_name": "TABLE_VIEW",
-      "period": "2025",
+      "period": "__LATEST_YEAR__",
       "filters": {
         "C1_NM": [
           "전체"
@@ -115,25 +227,25 @@
       "group_label": "구분",
       "detail_label": "세부",
       "metric_order": [
-        "매우 불만족 (%)",
-        "약간 불만족 (%)",
-        "보통 (%)",
-        "약간 만족 (%)",
-        "매우 만족 (%)"
+        "매우 불만족",
+        "약간 불만족",
+        "보통",
+        "약간 만족",
+        "매우 만족"
       ],
       "metric_label_map": {
-        "매우 불만족 (%)": "매우 불만족",
-        "약간 불만족 (%)": "약간 불만족",
-        "보통 (%)": "보통",
-        "약간 만족 (%)": "약간 만족",
-        "매우 만족 (%)": "매우 만족"
+        "매우 불만족": "매우 불만족",
+        "약간 불만족": "약간 불만족",
+        "보통": "보통",
+        "약간 만족": "약간 만족",
+        "매우 만족": "매우 만족"
       },
       "value_round_map": {
-        "매우 불만족 (%)": 1,
-        "약간 불만족 (%)": 1,
-        "보통 (%)": 1,
-        "약간 만족 (%)": 1,
-        "매우 만족 (%)": 1
+        "매우 불만족": 1,
+        "약간 불만족": 1,
+        "보통": 1,
+        "약간 만족": 1,
+        "매우 만족": 1
       }
     }
   ],

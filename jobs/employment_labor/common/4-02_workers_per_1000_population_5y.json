@@ -39,6 +39,7 @@
       "national_alias": "전국",
       "rank_year": "2024",
       "rank_label": "순위",
+      "value_round": 1,
       "cagr_label": "CAGR('21~'24)",
       "region_order": [
         "전국",

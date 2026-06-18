@@ -156,13 +156,9 @@
             ]
           },
           "years": [
-            "2020",
-            "2021",
-            "2022",
-            "2023",
-            "2024"
+            "__LATEST_5_YEARS__"
           ],
-          "cagr_label": "CAGR('20~'24)"
+          "cagr_label": "__AUTO_CAGR_LABEL__"
         },
         {
           "label": "노인천명당 노인여가복지시설수",
@@ -175,13 +171,9 @@
             ]
           },
           "years": [
-            "2020",
-            "2021",
-            "2022",
-            "2023",
-            "2024"
+            "__LATEST_5_YEARS__"
           ],
-          "cagr_label": "CAGR('20~'24)"
+          "cagr_label": "__AUTO_CAGR_LABEL__"
         }
       ]
     },
@@ -228,8 +220,7 @@
             ]
           },
           "years": [
-            "2023",
-            "2024"
+            "__LATEST_2_YEARS__"
           ],
           "change_label": "전년대비",
           "include_pct_change": false
@@ -245,8 +236,7 @@
             ]
           },
           "years": [
-            "2023",
-            "2024"
+            "__LATEST_2_YEARS__"
           ],
           "change_label": "전년대비",
           "pct_change_label": "증감률",
@@ -261,5 +251,5 @@
   "maintenance_review_20260513": [
     "2024 ?? ?? ?? ?? ??"
   ],
-  "latest_confirmed_year": "2024"
+  "latest_confirmed_year": "__LATEST_YEAR__"
 }

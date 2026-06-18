@@ -22,11 +22,7 @@
       "sheet_name": "TABLE_VIEW",
       "region_col": "C1_LABEL",
       "years": [
-        "2021",
-        "2022",
-        "2023",
-        "2024",
-        "2025"
+        "__LATEST_5_YEARS__"
       ],
       "filters": {
         "ITM_ID": [
@@ -36,9 +32,9 @@
       "area_label": "구분",
       "national_name": "인천광역시",
       "national_alias": "인천광역시",
-      "share_year": "2025",
+      "share_year": "__LATEST_YEAR__",
       "value_round": 0,
-      "cagr_label": "CAGR('21~'25)",
+      "cagr_label": "__AUTO_CAGR_LABEL__",
       "region_order": [
         "인천광역시",
         "인천광역시_중구",

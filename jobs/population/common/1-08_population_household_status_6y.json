@@ -1,5 +1,5 @@
 {
-  "job_name": "1-08_주민등록_인구_세대_현황_최근6년",
+  "job_name": "1-08_주민등록_인구_세대_현황_최근5년",
   "provider": "kosis_multi",
   "sources": [
     {
@@ -7,22 +7,38 @@
       "orgId": "101",
       "tblId": "DT_1B040A3",
       "prdSe": "Y",
-      "newEstPrdCnt": 6,
-      "itmId": "T20 T21 T22",
+      "newEstPrdCnt": 5,
+      "itmId": "T20",
       "objL1": "ALL",
       "format": "json",
-      "jsonVD": "Y"
+      "jsonVD": "Y",
+      "filters": {
+        "C1": [
+          "28"
+        ],
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      }
     },
     {
       "name": "households",
       "orgId": "101",
       "tblId": "DT_1B040B3",
       "prdSe": "Y",
-      "newEstPrdCnt": 6,
+      "newEstPrdCnt": 5,
       "itmId": "T1",
       "objL1": "ALL",
       "format": "json",
-      "jsonVD": "Y"
+      "jsonVD": "Y",
+      "filters": {
+        "C1": [
+          "28"
+        ],
+        "PRD_DE": [
+          "__LATEST_5_YEARS__"
+        ]
+      }
     }
   ],
   "merge_keys": [
@@ -33,34 +49,13 @@
   "metrics": [
     {
       "id": "population_total",
-      "label": "총인구수",
+      "label": "총 인구",
       "source": "population",
-      "source_filter": {
-        "ITM_ID": "T20"
-      },
-      "agg": "first"
-    },
-    {
-      "id": "population_male",
-      "label": "남자인구수",
-      "source": "population",
-      "source_filter": {
-        "ITM_ID": "T21"
-      },
-      "agg": "first"
-    },
-    {
-      "id": "population_female",
-      "label": "여자인구수",
-      "source": "population",
-      "source_filter": {
-        "ITM_ID": "T22"
-      },
       "agg": "first"
     },
     {
       "id": "households",
-      "label": "세대수",
+      "label": "세대 수",
       "source": "households",
       "agg": "first"
     },
@@ -68,12 +63,6 @@
       "id": "people_per_household",
       "label": "세대당 인구",
       "formula": "population_total / households",
-      "round": 2
-    },
-    {
-      "id": "sex_ratio",
-      "label": "남여 비율",
-      "formula": "population_male / population_female",
       "round": 2
     }
   ],
@@ -106,26 +95,31 @@
     }
   ],
   "output_subdir": "population/common",
-  "output_prefix": "1-08_주민등록_인구_세대_현황_최근6년",
-  "pivot": {
-    "index": [
-      "C1",
-      "C1_NM"
-    ],
-    "columns": [
-      "PRD_DE",
-      "METRIC"
-    ],
-    "values": "VALUE",
-    "sheet_name": "TABLE_VIEW",
-    "flatten_columns_year": false,
-    "sort": false
-  },
+  "output_prefix": "1-08_주민등록_인구_세대_현황_최근5년",
+  "views": [
+    {
+      "source": "metrics",
+      "kind": "category_timeseries_summary",
+      "sheet_name": "TABLE_VIEW",
+      "category_col": "METRIC",
+      "years": [
+        "__LATEST_5_YEARS__"
+      ],
+      "category_order": [
+        "총 인구",
+        "세대 수",
+        "세대당 인구"
+      ],
+      "row_label": "구분",
+      "cagr_label": "__AUTO_CAGR_LABEL__",
+      "value_round_map": {
+        "총 인구": 0,
+        "세대 수": 0,
+        "세대당 인구": 2
+      }
+    }
+  ],
   "scope_all_regions": true,
   "scope_type": "common",
-  "scope_regions": [],
-  "maintenance_review_20260513": [
-    "??? ?? ?? ?? ?? ?? ??",
-    "?? CAGR ???? ?? ?? ? ?? ?? ??"
-  ]
+  "scope_regions": []
 }

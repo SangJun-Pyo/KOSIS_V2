@@ -62,6 +62,12 @@
         "2023": "2023",
         "2024": "2024"
       },
+      "include_share": true,
+      "share_year": "2024",
+      "share_base_key": "T00",
+      "share_label": "비중",
+      "include_cagr": true,
+      "cagr_label": "CAGR",
       "value_round": 0,
       "repeat_group_label": false
     }

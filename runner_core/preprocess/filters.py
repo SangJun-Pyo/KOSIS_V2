@@ -1,6 +1,7 @@
 from typing import Any
 
 import pandas as pd
+from runner_core.periods import available_periods, resolve_period_list
 
 
 def apply_row_filters(df: pd.DataFrame, filters: Any) -> pd.DataFrame:
@@ -12,7 +13,10 @@ def apply_row_filters(df: pd.DataFrame, filters: Any) -> pd.DataFrame:
         if col not in d.columns:
             raise RuntimeError(f"filter column missing: {col}")
         allowed_vals = allowed if isinstance(allowed, list) else [allowed]
-        allowed_vals = [str(v) for v in allowed_vals]
+        if col == "PRD_DE":
+            allowed_vals = resolve_period_list(allowed_vals, available_periods(d[col].astype(str).tolist()))
+        else:
+            allowed_vals = [str(v) for v in allowed_vals]
         d = d[d[col].astype(str).isin(allowed_vals)]
     return d
 

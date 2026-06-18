@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 
 from runner_core.preprocess.filters import apply_row_filters
+from runner_core.periods import available_periods, resolve_cagr_label, resolve_period_list, resolve_period_value
 
 
 def make_ratio_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFrame:
@@ -26,13 +27,11 @@ def make_ratio_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFra
     work["PRD_DE"] = work["PRD_DE"].astype(str)
     work["DT"] = pd.to_numeric(work["DT"], errors="coerce").fillna(0)
 
-    years = [str(y) for y in pivot_cfg.get("years", [])]
+    available = available_periods(work["PRD_DE"].astype(str).tolist())
+    years = resolve_period_list([str(y) for y in pivot_cfg.get("years", [])], available)
     latest_years_count = int(pivot_cfg.get("latest_years_count", 0) or 0)
     if not years:
-        unique_years = sorted(
-            {str(v).strip() for v in work["PRD_DE"].dropna().astype(str)},
-            key=lambda x: int(x) if str(x).isdigit() else str(x),
-        )
+        unique_years = available
         if latest_years_count > 0:
             years = unique_years[-latest_years_count:]
         else:
@@ -66,9 +65,9 @@ def make_ratio_timeseries_pivot(df: pd.DataFrame, pivot_cfg: dict) -> pd.DataFra
     area_label = str(pivot_cfg.get("area_label", "구분"))
     national_name = str(pivot_cfg.get("national_name", "전국"))
     national_alias = str(pivot_cfg.get("national_alias", "계"))
-    cagr_label = str(pivot_cfg.get("cagr_label", f"CAGR('{years[0][2:]}~'{years[-1][2:]})"))
+    cagr_label = resolve_cagr_label(pivot_cfg.get("cagr_label"), years)
     stage_label = str(pivot_cfg.get("stage_label", "소멸위험 5단계"))
-    latest_year = str(pivot_cfg.get("latest_year", years[-1]))
+    latest_year = resolve_period_value(pivot_cfg.get("latest_year", years[-1]), available)
 
     region_order = [str(x) for x in pivot_cfg.get("region_order", [])]
     if not region_order:

@@ -87,7 +87,7 @@
       "sheet_name": "이동률",
       "filters": {
         "PRD_DE": [
-          "2024"
+          "__LATEST_1_YEARS__"
         ],
         "C1": [
           "11",
@@ -123,7 +123,7 @@
       "sheet_name": "SUMMARY_VIEW_1",
       "filters": {
         "PRD_DE": [
-          "2025"
+          "__LATEST_1_YEARS__"
         ],
         "C1": [
           "11",
@@ -146,7 +146,7 @@
       "sheet_name": "SUMMARY_VIEW_2",
       "filters": {
         "PRD_DE": [
-          "2025"
+          "__LATEST_1_YEARS__"
         ],
         "C1": [
           "11",

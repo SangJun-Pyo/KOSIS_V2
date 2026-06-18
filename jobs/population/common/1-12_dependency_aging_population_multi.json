@@ -44,11 +44,7 @@
       "values": "DT",
       "filters": {
         "PRD_DE": [
-          "2021",
-          "2022",
-          "2023",
-          "2024",
-          "2025"
+          "__LATEST_5_YEARS__"
         ],
         "C1": [
           "01",
@@ -116,11 +112,7 @@
           "39"
         ],
         "PRD_DE": [
-          "2021",
-          "2022",
-          "2023",
-          "2024",
-          "2025"
+          "__LATEST_5_YEARS__"
         ]
       },
       "sort": false
@@ -171,11 +163,7 @@
           "39"
         ],
         "PRD_DE": [
-          "2021",
-          "2022",
-          "2023",
-          "2024",
-          "2025"
+          "__LATEST_5_YEARS__"
         ]
       },
       "sort": false
@@ -214,16 +202,12 @@
       },
       "region_col": "C2_NM",
       "years": [
-        "2021",
-        "2022",
-        "2023",
-        "2024",
-        "2025"
+        "__LATEST_5_YEARS__"
       ],
-      "rank_year": "2025",
+      "rank_year": "__LATEST_YEAR__",
       "area_label": "구분",
       "rank_label": "순위",
-      "cagr_label": "CAGR('21~'25)",
+      "cagr_label": "__AUTO_CAGR_LABEL__",
       "national_name": "전국",
       "national_alias": "계"
     }

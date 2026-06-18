@@ -7,6 +7,13 @@
       "name": "life_dissatisfaction",
       "orgId": "204",
       "tblId": "DT_204010_2025A005",
+      "tblId_template": "DT_204010_{year}A005",
+      "tblId_year_fallbacks": [
+        0,
+        -1,
+        -2,
+        -3
+      ],
       "prdSe": "Y",
       "newEstPrdCnt": 1,
       "format": "json",
@@ -34,7 +41,7 @@
           "A0504"
         ],
         "PRD_DE": [
-          "2025"
+          "__LATEST_1_YEARS__"
         ]
       },
       "index": [
